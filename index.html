@@ -1,28 +1,4 @@
-cat > /tmp/build_aktivity.py << 'PYEOF'
-import base64, json
-
-def b64(path):
-    with open(path,'rb') as f:
-        return base64.b64encode(f.read()).decode()
-
-A = '/tmp/Shoe-project-main/src/assets/'
-s1=b64(A+'sneaker-1.png')
-s2=b64(A+'sneaker-2.png')
-s3=b64(A+'sneaker-3.png')
-s4=b64(A+'sneaker-4.png')
-s5=b64(A+'sneaker-5.png')
-s6=b64(A+'sneaker-6.png')
-hero=b64(A+'sneaker-hero.png')
-
-print("Images loaded, building HTML...")
-
-# We'll write the HTML in parts then join
-parts = []
-
-# ─────────────────────────────────────────────
-# HEAD + CSS
-# ─────────────────────────────────────────────
-parts.append(f"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -3355,11 +3331,4 @@ document.getElementById('back-top').addEventListener('click',()=>window.scrollTo
 
 </script>
 </body>
-</html>""")
-
-html = ''.join(parts)
-with open('/home/claude/aktivity_store.html','w') as f:
-    f.write(html)
-print(f"Done! File size: {len(html):,} bytes ({len(html)//1024} KB)")
-PYEOF
-python3 /tmp/build_aktivity.py
+</html>
