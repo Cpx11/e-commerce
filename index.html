@@ -9,30 +9,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet"/>
 <!-- Firebase -->
 <script type="module">
-  import {{ initializeApp }} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {{ getFirestore, collection, addDoc, getDocs, doc, updateDoc, onSnapshot, serverTimestamp, query, orderBy, where }}
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, onSnapshot, serverTimestamp, query, orderBy, where }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import {{ getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }}
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   // 🔴 REPLACE with your Firebase project config:
-  const firebaseConfig = {{
+  const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
     projectId: "YOUR_PROJECT_ID",
     storageBucket: "YOUR_PROJECT.appspot.com",
     messagingSenderId: "YOUR_SENDER_ID",
     appId: "YOUR_APP_ID"
-  }};
+  };
 
   const app  = initializeApp(firebaseConfig);
   const db   = getFirestore(app);
   const auth = getAuth(app);
 
   // Expose to global scope
-  window._fb = {{ db, auth, collection, addDoc, getDocs, doc, updateDoc,
+  window._fb = { db, auth, collection, addDoc, getDocs, doc, updateDoc,
     onSnapshot, serverTimestamp, query, orderBy, where,
-    signInWithEmailAndPassword, signOut, onAuthStateChanged }};
+    signInWithEmailAndPassword, signOut, onAuthStateChanged };
   window.dispatchEvent(new Event('fb-ready'));
 </script>
 <!-- EmailJS -->
@@ -42,7 +42,7 @@
    DESIGN TOKENS — AKTIVITY STREET VIBE
    Warm concrete + acid yellow + off-white + rust
    ═══════════════════════════════════════════════ */
-:root{{
+:root{
   /* STREET PALETTE */
   --asphalt:   #1a1a1a;
   --concrete:  #2e2e2e;
@@ -83,162 +83,162 @@
   --nav-h: 70px;
   --r:     10px;
   --r2:    18px;
-}}
+}
 
-*,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
-html{{scroll-behavior:smooth;font-size:16px;}}
-body{{
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{
   background:var(--bg);color:var(--fg);
   font-family:var(--font-body);
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
   min-height:100vh;
-}}
-a{{text-decoration:none;color:inherit;}}
-img{{display:block;max-width:100%;}}
-button{{cursor:pointer;font-family:var(--font-body);border:none;background:none;color:inherit;}}
-input,textarea,select{{font-family:var(--font-body);}}
-ul{{list-style:none;}}
+}
+a{text-decoration:none;color:inherit;}
+img{display:block;max-width:100%;}
+button{cursor:pointer;font-family:var(--font-body);border:none;background:none;color:inherit;}
+input,textarea,select{font-family:var(--font-body);}
+ul{list-style:none;}
 
 /* SCROLLBAR */
-::-webkit-scrollbar{{width:6px;}}
-::-webkit-scrollbar-track{{background:var(--asphalt);}}
-::-webkit-scrollbar-thumb{{background:var(--gravel);border-radius:3px;}}
-::-webkit-scrollbar-thumb:hover{{background:var(--acid);}}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--asphalt);}
+::-webkit-scrollbar-thumb{background:var(--gravel);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--acid);}
 
 /* SELECTION */
-::selection{{background:var(--acid);color:var(--asphalt);}}
+::selection{background:var(--acid);color:var(--asphalt);}
 
 /* ─── LAYOUT ─────────────────────────────────── */
-.container{{width:100%;max-width:1340px;margin:0 auto;padding:0 1.5rem;}}
-.page{{display:none;min-height:100vh;padding-top:var(--nav-h);}}
-.page.active{{display:block;}}
+.container{width:100%;max-width:1340px;margin:0 auto;padding:0 1.5rem;}
+.page{display:none;min-height:100vh;padding-top:var(--nav-h);}
+.page.active{display:block;}
 
 /* ─── TYPOGRAPHY ─────────────────────────────── */
-.display{{font-family:var(--font-display);letter-spacing:0.02em;line-height:0.95;}}
-.heading{{font-family:var(--font-cond);font-weight:800;letter-spacing:-0.01em;}}
-.eyebrow{{
+.display{font-family:var(--font-display);letter-spacing:0.02em;line-height:0.95;}
+.heading{font-family:var(--font-cond);font-weight:800;letter-spacing:-0.01em;}
+.eyebrow{
   font-family:var(--font-cond);font-weight:700;font-size:0.7rem;
   letter-spacing:0.3em;text-transform:uppercase;color:var(--acid);
-}}
-.text-acid{{color:var(--acid);}}
-.text-rust{{color:var(--rust);}}
-.text-muted{{color:var(--fg-muted);}}
+}
+.text-acid{color:var(--acid);}
+.text-rust{color:var(--rust);}
+.text-muted{color:var(--fg-muted);}
 
 /* ─── BUTTONS ────────────────────────────────── */
-.btn{{
+.btn{
   display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;
   font-family:var(--font-cond);font-weight:700;font-size:0.9rem;
   text-transform:uppercase;letter-spacing:0.1em;
   border:none;border-radius:var(--r);cursor:pointer;
   transition:all 0.25s ease;position:relative;overflow:hidden;
   white-space:nowrap;
-}}
-.btn::after{{
+}
+.btn::after{
   content:'';position:absolute;inset:0;
   background:rgba(255,255,255,0.1);opacity:0;
   transition:opacity 0.2s;
-}}
-.btn:hover::after{{opacity:1;}}
+}
+.btn:hover::after{opacity:1;}
 
-.btn-primary{{
+.btn-primary{
   background:var(--acid);color:var(--asphalt);
   padding:0.8rem 1.8rem;
   box-shadow:0 4px 20px rgba(212,240,0,0.3);
-}}
-.btn-primary:hover{{transform:translateY(-2px);box-shadow:0 8px 28px rgba(212,240,0,0.5);}}
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(212,240,0,0.5);}
 
-.btn-secondary{{
+.btn-secondary{
   background:var(--concrete);color:var(--fg);
   border:1px solid var(--border2);
   padding:0.8rem 1.8rem;
-}}
-.btn-secondary:hover{{border-color:var(--acid);color:var(--acid);}}
+}
+.btn-secondary:hover{border-color:var(--acid);color:var(--acid);}
 
-.btn-rust{{
+.btn-rust{
   background:var(--rust);color:#fff;
   padding:0.8rem 1.8rem;
   box-shadow:0 4px 20px rgba(224,92,42,0.3);
-}}
-.btn-rust:hover{{transform:translateY(-2px);box-shadow:0 8px 28px rgba(224,92,42,0.5);}}
+}
+.btn-rust:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(224,92,42,0.5);}
 
-.btn-ghost{{
+.btn-ghost{
   background:transparent;color:var(--fg);
   border:1px solid var(--border2);
   padding:0.7rem 1.5rem;
-}}
-.btn-ghost:hover{{background:var(--concrete);}}
+}
+.btn-ghost:hover{background:var(--concrete);}
 
-.btn-sm{{padding:0.5rem 1rem;font-size:0.8rem;}}
-.btn-lg{{padding:1.1rem 2.5rem;font-size:1rem;}}
-.btn-icon{{
+.btn-sm{padding:0.5rem 1rem;font-size:0.8rem;}
+.btn-lg{padding:1.1rem 2.5rem;font-size:1rem;}
+.btn-icon{
   width:2.5rem;height:2.5rem;border-radius:50%;
   padding:0;
   background:var(--concrete);border:1px solid var(--border2);
-}}
-.btn-icon:hover{{background:var(--gravel);}}
+}
+.btn-icon:hover{background:var(--gravel);}
 
 /* ─── INPUTS ─────────────────────────────────── */
-.input{{
+.input{
   width:100%;padding:0.85rem 1rem;
   background:var(--card2);
   border:1px solid var(--border);
   border-radius:var(--r);color:var(--fg);
   font-size:0.95rem;outline:none;
   transition:border-color 0.2s,box-shadow 0.2s;
-}}
-.input::placeholder{{color:var(--fg-muted);}}
-.input:focus{{border-color:var(--acid);box-shadow:0 0 0 3px rgba(212,240,0,0.15);}}
-.input-label{{
+}
+.input::placeholder{color:var(--fg-muted);}
+.input:focus{border-color:var(--acid);box-shadow:0 0 0 3px rgba(212,240,0,0.15);}
+.input-label{
   display:block;font-family:var(--font-cond);font-weight:700;
   font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;
   color:var(--fg-muted);margin-bottom:0.4rem;
-}}
-.form-group{{margin-bottom:1.1rem;}}
-select.input{{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8680' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}}
+}
+.form-group{margin-bottom:1.1rem;}
+select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8680' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
 
 /* ─── CARDS ──────────────────────────────────── */
-.card{{
+.card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);overflow:hidden;
   transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
-}}
-.card:hover{{
+}
+.card:hover{
   transform:translateY(-4px);
   box-shadow:0 20px 40px rgba(0,0,0,0.4);
   border-color:var(--border2);
-}}
+}
 
 /* ─── BADGE ──────────────────────────────────── */
-.badge{{
+.badge{
   display:inline-block;
   font-family:var(--font-cond);font-weight:700;font-size:0.65rem;
   text-transform:uppercase;letter-spacing:0.1em;
   padding:0.2rem 0.6rem;border-radius:4px;
-}}
-.badge-acid{{background:var(--acid);color:var(--asphalt);}}
-.badge-rust{{background:var(--rust);color:#fff;}}
-.badge-violet{{background:var(--violet);color:#fff;}}
-.badge-sky{{background:var(--sky);color:var(--asphalt);}}
-.badge-mint{{background:var(--mint);color:var(--asphalt);}}
+}
+.badge-acid{background:var(--acid);color:var(--asphalt);}
+.badge-rust{background:var(--rust);color:#fff;}
+.badge-violet{background:var(--violet);color:#fff;}
+.badge-sky{background:var(--sky);color:var(--asphalt);}
+.badge-mint{background:var(--mint);color:var(--asphalt);}
 
 /* ─── SECTION HEADERS ────────────────────────── */
-.section-header{{margin-bottom:3rem;}}
-.section-header h2{{
+.section-header{margin-bottom:3rem;}
+.section-header h2{
   font-family:var(--font-display);
   font-size:clamp(3rem,7vw,6rem);
   line-height:0.95;
   margin-bottom:0.5rem;
-}}
-.section-header p{{color:var(--fg-muted);max-width:42rem;font-size:1.05rem;}}
+}
+.section-header p{color:var(--fg-muted);max-width:42rem;font-size:1.05rem;}
 
 /* ─── TOAST ──────────────────────────────────── */
-#toast-container{{
+#toast-container{
   position:fixed;bottom:2rem;right:2rem;z-index:9999;
   display:flex;flex-direction:column;gap:0.75rem;
   pointer-events:none;
-}}
-.toast{{
+}
+.toast{
   background:var(--card2);border:1px solid var(--border2);
   border-radius:var(--r);padding:1rem 1.5rem;
   font-family:var(--font-cond);font-weight:600;font-size:0.9rem;
@@ -246,156 +246,156 @@ select.input{{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xm
   display:flex;align-items:center;gap:0.75rem;
   animation:slideInToast 0.3s ease;
   pointer-events:all;box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}}
-.toast.success{{border-left:3px solid var(--success);}}
-.toast.error{{border-left:3px solid var(--danger);}}
-.toast.info{{border-left:3px solid var(--acid);}}
-@keyframes slideInToast{{
-  from{{transform:translateX(120%);opacity:0;}}
-  to{{transform:translateX(0);opacity:1;}}
-}}
-@keyframes slideOutToast{{
-  to{{transform:translateX(120%);opacity:0;}}
-}}
+}
+.toast.success{border-left:3px solid var(--success);}
+.toast.error{border-left:3px solid var(--danger);}
+.toast.info{border-left:3px solid var(--acid);}
+@keyframes slideInToast{
+  from{transform:translateX(120%);opacity:0;}
+  to{transform:translateX(0);opacity:1;}
+}
+@keyframes slideOutToast{
+  to{transform:translateX(120%);opacity:0;}
+}
 
 /* ─── MODAL ──────────────────────────────────── */
-.modal-overlay{{
+.modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.85);
   z-index:8000;display:none;
   align-items:center;justify-content:center;
   backdrop-filter:blur(8px);
   padding:1rem;
-}}
-.modal-overlay.open{{display:flex;}}
-.modal{{
+}
+.modal-overlay.open{display:flex;}
+.modal{
   background:var(--card);border:1px solid var(--border2);
   border-radius:var(--r2);padding:2rem;
   max-width:560px;width:100%;
   max-height:90vh;overflow-y:auto;
   animation:modalIn 0.3s ease;
-}}
-.modal-wide{{max-width:800px;}}
-@keyframes modalIn{{
-  from{{transform:scale(0.92) translateY(20px);opacity:0;}}
-  to{{transform:scale(1) translateY(0);opacity:1;}}
-}}
-.modal-header{{
+}
+.modal-wide{max-width:800px;}
+@keyframes modalIn{
+  from{transform:scale(0.92) translateY(20px);opacity:0;}
+  to{transform:scale(1) translateY(0);opacity:1;}
+}
+.modal-header{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:1.5rem;
-}}
-.modal-close{{
+}
+.modal-close{
   width:2rem;height:2rem;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:var(--gravel);font-size:1.1rem;
   transition:background 0.2s;
-}}
-.modal-close:hover{{background:var(--smoke);}}
+}
+.modal-close:hover{background:var(--smoke);}
 
 /* ─── LOADER ─────────────────────────────────── */
-#site-loader{{
+#site-loader{
   position:fixed;inset:0;background:var(--asphalt);
   z-index:99999;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:1.5rem;
-}}
-.loader-logo{{
+}
+.loader-logo{
   font-family:var(--font-display);font-size:5rem;
   color:var(--fg);
   position:relative;
-}}
-.loader-logo .cn{{
+}
+.loader-logo .cn{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-cn);font-size:2.2rem;
   color:rgba(212,240,0,0.18);letter-spacing:0.05em;
   white-space:nowrap;z-index:-1;
-}}
-.loader-bar{{
+}
+.loader-bar{
   width:180px;height:3px;background:var(--gravel);border-radius:2px;overflow:hidden;
-}}
-.loader-fill{{
+}
+.loader-fill{
   height:100%;background:var(--acid);border-radius:2px;
   animation:loaderAnim 1.6s ease forwards;
-}}
-@keyframes loaderAnim{{from{{width:0;}}to{{width:100%;}}}}
-.loader-text{{
+}
+@keyframes loaderAnim{from{width:0;}to{width:100%;}}
+.loader-text{
   font-family:var(--font-cond);font-weight:600;font-size:0.75rem;
   text-transform:uppercase;letter-spacing:0.3em;color:var(--fg-muted);
-}}
+}
 
 /* ═══════════════════════════════════════════════
    NAVIGATION
    ═══════════════════════════════════════════════ */
-#navbar{{
+#navbar{
   position:fixed;top:0;left:0;right:0;z-index:1000;
   height:var(--nav-h);
   background:rgba(28,28,28,0.85);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   transition:all 0.3s;
-}}
-#navbar.scrolled{{
+}
+#navbar.scrolled{
   background:rgba(26,26,26,0.95);
   box-shadow:0 4px 30px rgba(0,0,0,0.5);
-}}
-.nav-inner{{
+}
+.nav-inner{
   height:100%;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
-}}
+}
 /* Logo */
-.nav-logo{{
+.nav-logo{
   position:relative;flex-shrink:0;cursor:pointer;
-}}
-.nav-logo .logo-text{{
+}
+.nav-logo .logo-text{
   font-family:var(--font-display);font-size:2rem;
   color:var(--fg);line-height:1;letter-spacing:0.04em;
   position:relative;z-index:1;
-}}
-.nav-logo .logo-cn{{
+}
+.nav-logo .logo-cn{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-cn);font-size:0.85rem;
   color:rgba(212,240,0,0.22);letter-spacing:0.08em;
   white-space:nowrap;z-index:0;pointer-events:none;
   font-weight:700;
-}}
+}
 /* Nav links */
-.nav-links{{display:flex;align-items:center;gap:0.25rem;}}
-.nav-link{{
+.nav-links{display:flex;align-items:center;gap:0.25rem;}
+.nav-link{
   font-family:var(--font-cond);font-weight:700;font-size:0.82rem;
   text-transform:uppercase;letter-spacing:0.12em;color:var(--fg-muted);
   padding:0.4rem 0.75rem;border-radius:6px;
   transition:color 0.2s,background 0.2s;cursor:pointer;
-}}
-.nav-link:hover,.nav-link.active{{color:var(--fg);background:rgba(255,255,255,0.06);}}
-.nav-link.active{{color:var(--acid);}}
+}
+.nav-link:hover,.nav-link.active{color:var(--fg);background:rgba(255,255,255,0.06);}
+.nav-link.active{color:var(--acid);}
 /* Category pill */
-.nav-cats{{display:flex;align-items:center;gap:0.35rem;}}
-.cat-pill{{
+.nav-cats{display:flex;align-items:center;gap:0.35rem;}
+.cat-pill{
   font-family:var(--font-cond);font-weight:700;font-size:0.73rem;
   text-transform:uppercase;letter-spacing:0.1em;
   padding:0.3rem 0.8rem;border-radius:20px;
   border:1px solid var(--border2);color:var(--fg-muted);
   cursor:pointer;transition:all 0.2s;
-}}
-.cat-pill:hover,.cat-pill.active{{
+}
+.cat-pill:hover,.cat-pill.active{
   background:var(--acid);color:var(--asphalt);border-color:var(--acid);
-}}
+}
 /* Nav right */
-.nav-right{{display:flex;align-items:center;gap:0.5rem;}}
-.nav-icon{{
+.nav-right{display:flex;align-items:center;gap:0.5rem;}
+.nav-icon{
   width:2.2rem;height:2.2rem;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   color:var(--fg-muted);cursor:pointer;
   transition:all 0.2s;
-}}
-.nav-icon:hover{{background:var(--concrete);color:var(--fg);}}
+}
+.nav-icon:hover{background:var(--concrete);color:var(--fg);}
 /* Cart button */
-.cart-btn{{
+.cart-btn{
   position:relative;
   background:var(--acid);color:var(--asphalt);
   width:2.5rem;height:2.5rem;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   transition:all 0.25s;
-}}
-.cart-btn:hover{{transform:scale(1.1);box-shadow:0 4px 16px rgba(212,240,0,0.4);}}
-.cart-count{{
+}
+.cart-btn:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(212,240,0,0.4);}
+.cart-count{
   position:absolute;top:-4px;right:-4px;
   background:var(--rust);color:#fff;
   width:1.1rem;height:1.1rem;border-radius:50%;
@@ -403,142 +403,142 @@ select.input{{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xm
   display:flex;align-items:center;justify-content:center;
   border:2px solid var(--bg);
   transition:transform 0.2s;
-}}
-.cart-count.bump{{transform:scale(1.4);}}
+}
+.cart-count.bump{transform:scale(1.4);}
 /* Hamburger */
-.hamburger{{
+.hamburger{
   display:none;flex-direction:column;gap:5px;
   width:2.2rem;height:2.2rem;
   align-items:center;justify-content:center;
-}}
-.hamburger span{{
+}
+.hamburger span{
   display:block;width:20px;height:2px;
   background:var(--fg);border-radius:2px;
   transition:all 0.3s;
-}}
-.hamburger.open span:nth-child(1){{transform:translateY(7px) rotate(45deg);}}
-.hamburger.open span:nth-child(2){{opacity:0;width:0;}}
-.hamburger.open span:nth-child(3){{transform:translateY(-7px) rotate(-45deg);}}
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;width:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 /* Mobile menu */
-#mobile-nav{{
+#mobile-nav{
   display:none;position:fixed;
   top:var(--nav-h);left:0;right:0;bottom:0;
   background:rgba(26,26,26,0.97);backdrop-filter:blur(20px);
   z-index:999;flex-direction:column;
   padding:2rem;gap:0.5rem;overflow-y:auto;
-}}
-#mobile-nav.open{{display:flex;}}
-.mobile-nav-link{{
+}
+#mobile-nav.open{display:flex;}
+.mobile-nav-link{
   font-family:var(--font-display);font-size:2rem;
   padding:0.75rem 0;border-bottom:1px solid var(--border);
   cursor:pointer;transition:color 0.2s;
-}}
-.mobile-nav-link:hover{{color:var(--acid);}}
+}
+.mobile-nav-link:hover{color:var(--acid);}
 /* Announcement */
-.announcement{{
+.announcement{
   background:var(--acid);color:var(--asphalt);
   text-align:center;
   font-family:var(--font-cond);font-weight:700;font-size:0.78rem;
   text-transform:uppercase;letter-spacing:0.2em;
   padding:0.45rem 1rem;
   position:fixed;top:0;left:0;right:0;z-index:1001;
-}}
+}
 
 /* ═══════════════════════════════════════════════
    HERO
    ═══════════════════════════════════════════════ */
-#page-home{{padding-top:calc(var(--nav-h) + 28px);}}
-.hero{{
+#page-home{padding-top:calc(var(--nav-h) + 28px);}
+.hero{
   position:relative;min-height:calc(100vh - var(--nav-h) - 28px);
   display:flex;align-items:center;overflow:hidden;
-}}
-.hero-bg{{
+}
+.hero-bg{
   position:absolute;inset:0;
   background:
     radial-gradient(ellipse 60% 70% at 70% 40%, rgba(212,240,0,0.08) 0%,transparent 60%),
     radial-gradient(ellipse 40% 50% at 20% 80%, rgba(224,92,42,0.06) 0%,transparent 50%),
     var(--bg);
-}}
-.hero-grain{{
+}
+.hero-grain{
   position:absolute;inset:0;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   opacity:0.4;pointer-events:none;
-}}
-.hero-inner{{
+}
+.hero-inner{
   display:grid;grid-template-columns:1fr 1fr;gap:3rem;
   align-items:center;padding:4rem 0;position:relative;z-index:1;
-}}
-.hero-label{{
+}
+.hero-label{
   display:inline-flex;align-items:center;gap:0.5rem;
   background:rgba(212,240,0,0.1);border:1px solid rgba(212,240,0,0.25);
   border-radius:20px;padding:0.3rem 0.75rem;
   margin-bottom:1.5rem;
-}}
-.hero-label-dot{{width:6px;height:6px;border-radius:50%;background:var(--acid);animation:pulse 2s infinite;}}
-@keyframes pulse{{0%,100%{{opacity:1;}}50%{{opacity:0.3;}}}}
-.hero-label span{{
+}
+.hero-label-dot{width:6px;height:6px;border-radius:50%;background:var(--acid);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.hero-label span{
   font-family:var(--font-cond);font-weight:700;font-size:0.72rem;
   text-transform:uppercase;letter-spacing:0.2em;color:var(--acid);
-}}
-.hero-h1{{
+}
+.hero-h1{
   font-family:var(--font-display);
   font-size:clamp(4.5rem,10vw,9.5rem);
   line-height:0.88;margin-bottom:1.5rem;
-}}
-.hero-h1 .line2{{
+}
+.hero-h1 .line2{
   -webkit-text-stroke:2px var(--acid);color:transparent;
-}}
-.hero-sub{{
+}
+.hero-sub{
   font-family:var(--font-cond);font-weight:300;font-size:1.3rem;
   color:var(--fg-muted);letter-spacing:0.05em;
   max-width:28rem;margin-bottom:2.5rem;line-height:1.6;
-}}
-.hero-actions{{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:3rem;}}
-.hero-stats{{display:flex;gap:2.5rem;}}
-.hero-stat-val{{
+}
+.hero-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:3rem;}
+.hero-stats{display:flex;gap:2.5rem;}
+.hero-stat-val{
   font-family:var(--font-display);font-size:2rem;color:var(--fg);
-}}
-.hero-stat-val span{{color:var(--acid);}}
-.hero-stat-label{{
+}
+.hero-stat-val span{color:var(--acid);}
+.hero-stat-label{
   font-family:var(--font-cond);font-size:0.72rem;
   text-transform:uppercase;letter-spacing:0.15em;color:var(--fg-muted);
-}}
+}
 /* Hero right */
-.hero-visual{{position:relative;}}
-.hero-shoe-wrap{{
+.hero-visual{position:relative;}
+.hero-shoe-wrap{
   position:relative;
   background:linear-gradient(135deg,rgba(212,240,0,0.06),rgba(224,92,42,0.04));
   border:1px solid var(--border2);border-radius:2rem;
   padding:2.5rem;overflow:hidden;
-}}
-.hero-shoe-wrap::before{{
+}
+.hero-shoe-wrap::before{
   content:'';position:absolute;top:-40%;right:-20%;
   width:70%;height:70%;border-radius:50%;
   background:radial-gradient(circle,rgba(212,240,0,0.12) 0%,transparent 70%);
   filter:blur(40px);
-}}
-.hero-shoe{{
+}
+.hero-shoe{
   width:100%;max-width:420px;margin:0 auto;
   animation:heroFloat 5s ease-in-out infinite;
   filter:drop-shadow(0 30px 50px rgba(0,0,0,0.6));
-}}
-@keyframes heroFloat{{
-  0%,100%{{transform:translateY(0) rotate(-4deg);}}
-  50%{{transform:translateY(-18px) rotate(-4deg);}}
-}}
-.hero-tag{{
+}
+@keyframes heroFloat{
+  0%,100%{transform:translateY(0) rotate(-4deg);}
+  50%{transform:translateY(-18px) rotate(-4deg);}
+}
+.hero-tag{
   position:absolute;bottom:2rem;left:2rem;
   background:var(--card);border:1px solid var(--border2);
   border-radius:var(--r);padding:0.75rem 1rem;
-}}
-.hero-tag-name{{
+}
+.hero-tag-name{
   font-family:var(--font-cond);font-weight:800;font-size:0.95rem;
   color:var(--fg);
-}}
-.hero-tag-price{{
+}
+.hero-tag-price{
   font-family:var(--font-display);font-size:1.5rem;color:var(--acid);
-}}
-.hero-badge{{
+}
+.hero-badge{
   position:absolute;top:2rem;right:2rem;
   background:var(--rust);color:#fff;
   width:4rem;height:4rem;border-radius:50%;
@@ -546,786 +546,786 @@ select.input{{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xm
   font-family:var(--font-cond);font-weight:800;font-size:0.65rem;
   text-transform:uppercase;text-align:center;line-height:1.2;
   animation:spin 10s linear infinite;
-}}
-.hero-ticker{{
+}
+.hero-ticker{
   background:var(--concrete);border-top:1px solid var(--border);
   overflow:hidden;padding:0.6rem 0;margin-top:1rem;
-}}
-.ticker-track{{
+}
+.ticker-track{
   display:flex;gap:0;
   animation:tickerScroll 25s linear infinite;
   width:max-content;
-}}
-@keyframes tickerScroll{{from{{transform:translateX(0);}}to{{transform:translateX(-50%);}}}}
-.ticker-item{{
+}
+@keyframes tickerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{
   font-family:var(--font-cond);font-weight:700;font-size:0.8rem;
   text-transform:uppercase;letter-spacing:0.15em;color:var(--fg-muted);
   padding:0 2rem;display:flex;align-items:center;gap:1rem;white-space:nowrap;
-}}
-.ticker-dot{{width:4px;height:4px;border-radius:50%;background:var(--acid);}}
+}
+.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--acid);}
 
 /* ═══════════════════════════════════════════════
    PROMO STRIP
    ═══════════════════════════════════════════════ */
-.promo-strip{{
+.promo-strip{
   background:linear-gradient(135deg,var(--rust),#c04820);
   padding:3rem 0;overflow:hidden;position:relative;
-}}
-.promo-strip::before{{
+}
+.promo-strip::before{
   content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(
     -45deg,transparent,transparent 10px,rgba(255,255,255,0.03) 10px,rgba(255,255,255,0.03) 20px
   );
-}}
-.promo-inner{{
+}
+.promo-inner{
   display:flex;align-items:center;justify-content:space-between;
   gap:2rem;position:relative;z-index:1;flex-wrap:wrap;
-}}
-.promo-text h3{{
+}
+.promo-text h3{
   font-family:var(--font-display);
   font-size:clamp(3rem,8vw,6rem);
   color:#fff;line-height:0.9;
-}}
-.promo-text p{{
+}
+.promo-text p{
   font-family:var(--font-cond);font-weight:600;font-size:1.2rem;
   color:rgba(255,255,255,0.8);letter-spacing:0.1em;
   text-transform:uppercase;margin-top:0.5rem;
-}}
-.promo-code{{
+}
+.promo-code{
   background:rgba(255,255,255,0.15);border:1px dashed rgba(255,255,255,0.4);
   border-radius:var(--r);padding:1rem 1.5rem;text-align:center;
-}}
-.promo-code-label{{
+}
+.promo-code-label{
   font-family:var(--font-cond);font-size:0.7rem;text-transform:uppercase;
   letter-spacing:0.2em;color:rgba(255,255,255,0.7);margin-bottom:0.3rem;
-}}
-.promo-code-value{{
+}
+.promo-code-value{
   font-family:var(--font-display);font-size:2rem;color:#fff;letter-spacing:0.2em;
-}}
+}
 
 /* ═══════════════════════════════════════════════
    PRODUCTS GRID
    ═══════════════════════════════════════════════ */
-.products-section{{padding:5rem 0;}}
-.filter-bar{{
+.products-section{padding:5rem 0;}
+.filter-bar{
   display:flex;align-items:center;justify-content:space-between;
   gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap;
-}}
-.filter-tabs{{display:flex;gap:0.5rem;flex-wrap:wrap;}}
-.filter-tab{{
+}
+.filter-tabs{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.filter-tab{
   font-family:var(--font-cond);font-weight:700;font-size:0.8rem;
   text-transform:uppercase;letter-spacing:0.1em;
   padding:0.45rem 1rem;border-radius:20px;
   border:1px solid var(--border2);color:var(--fg-muted);
   cursor:pointer;transition:all 0.2s;
-}}
-.filter-tab:hover,.filter-tab.active{{
+}
+.filter-tab:hover,.filter-tab.active{
   background:var(--acid);color:var(--asphalt);border-color:var(--acid);
-}}
-.sort-select{{
+}
+.sort-select{
   background:var(--card2);border:1px solid var(--border);color:var(--fg);
   font-family:var(--font-cond);font-weight:700;font-size:0.8rem;
   text-transform:uppercase;letter-spacing:0.1em;
   padding:0.45rem 2rem 0.45rem 0.9rem;border-radius:20px;cursor:pointer;outline:none;
   appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238a8680' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 0.7rem center;
-}}
-.products-grid{{
+}
+.products-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
   gap:1.5rem;
-}}
+}
 
 /* ─── PRODUCT CARD ───────────────────────────── */
-.product-card{{
+.product-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);overflow:hidden;cursor:pointer;
   transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
   position:relative;
-}}
-.product-card:hover{{
+}
+.product-card:hover{
   transform:translateY(-6px);
   box-shadow:0 24px 50px rgba(0,0,0,0.5);
   border-color:rgba(212,240,0,0.2);
-}}
-.product-card-img{{
+}
+.product-card-img{
   position:relative;background:var(--card2);
   padding:1.5rem;
   height:220px;display:flex;align-items:center;justify-content:center;
   overflow:hidden;
-}}
-.product-card-img img{{
+}
+.product-card-img img{
   height:170px;width:auto;object-fit:contain;
   transition:transform 0.4s ease;
   filter:drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-}}
-.product-card:hover .product-card-img img{{transform:scale(1.1) rotate(4deg);}}
-.product-card-badges{{position:absolute;top:0.75rem;left:0.75rem;display:flex;gap:0.4rem;flex-direction:column;}}
-.product-card-actions{{
+}
+.product-card:hover .product-card-img img{transform:scale(1.1) rotate(4deg);}
+.product-card-badges{position:absolute;top:0.75rem;left:0.75rem;display:flex;gap:0.4rem;flex-direction:column;}
+.product-card-actions{
   position:absolute;inset:0;
   background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
   display:flex;align-items:center;justify-content:center;gap:0.75rem;
   opacity:0;transition:opacity 0.3s;
-}}
-.product-card:hover .product-card-actions{{opacity:1;}}
-.wishlist-btn{{
+}
+.product-card:hover .product-card-actions{opacity:1;}
+.wishlist-btn{
   position:absolute;top:0.75rem;right:0.75rem;
   width:2rem;height:2rem;border-radius:50%;
   background:rgba(28,28,28,0.8);
   display:flex;align-items:center;justify-content:center;
   color:var(--fg-muted);font-size:0.9rem;
   transition:all 0.2s;border:1px solid var(--border);
-}}
-.wishlist-btn:hover,.wishlist-btn.active{{color:var(--rust);border-color:var(--rust);}}
-.product-card-body{{padding:1.2rem;}}
-.product-card-cat{{
+}
+.wishlist-btn:hover,.wishlist-btn.active{color:var(--rust);border-color:var(--rust);}
+.product-card-body{padding:1.2rem;}
+.product-card-cat{
   font-family:var(--font-cond);font-weight:700;font-size:0.68rem;
   text-transform:uppercase;letter-spacing:0.15em;color:var(--fg-muted);
   margin-bottom:0.3rem;
-}}
-.product-card-name{{
+}
+.product-card-name{
   font-family:var(--font-cond);font-weight:800;font-size:1.15rem;
   color:var(--fg);margin-bottom:0.5rem;
   transition:color 0.2s;
-}}
-.product-card:hover .product-card-name{{color:var(--acid);}}
-.product-card-rating{{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem;}}
-.stars{{color:var(--gold);font-size:0.75rem;letter-spacing:1px;}}
-.rating-count{{font-size:0.72rem;color:var(--fg-muted);}}
-.product-card-footer{{display:flex;align-items:center;justify-content:space-between;}}
-.price{{font-family:var(--font-display);font-size:1.5rem;color:var(--fg);}}
-.price-old{{font-size:0.9rem;color:var(--fg-muted);text-decoration:line-through;margin-left:0.4rem;}}
-.add-btn{{
+}
+.product-card:hover .product-card-name{color:var(--acid);}
+.product-card-rating{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.75rem;}
+.stars{color:var(--gold);font-size:0.75rem;letter-spacing:1px;}
+.rating-count{font-size:0.72rem;color:var(--fg-muted);}
+.product-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.price{font-family:var(--font-display);font-size:1.5rem;color:var(--fg);}
+.price-old{font-size:0.9rem;color:var(--fg-muted);text-decoration:line-through;margin-left:0.4rem;}
+.add-btn{
   width:2.5rem;height:2.5rem;border-radius:50%;
   background:var(--acid);color:var(--asphalt);
   display:flex;align-items:center;justify-content:center;
   font-size:1.2rem;font-weight:700;
   transition:all 0.25s;
-}}
-.add-btn:hover{{transform:scale(1.15);box-shadow:0 4px 16px rgba(212,240,0,0.4);}}
+}
+.add-btn:hover{transform:scale(1.15);box-shadow:0 4px 16px rgba(212,240,0,0.4);}
 
 /* ─── PRODUCT DETAIL MODAL ───────────────────── */
-.product-detail{{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}}
-.detail-img-wrap{{
+.product-detail{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.detail-img-wrap{
   background:var(--card2);border-radius:var(--r2);
   display:flex;align-items:center;justify-content:center;
   padding:2rem;min-height:300px;
-}}
-.detail-img{{max-height:280px;object-fit:contain;filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));}}
-.detail-name{{font-family:var(--font-display);font-size:2.5rem;line-height:1;margin-bottom:0.5rem;}}
-.detail-price{{font-family:var(--font-display);font-size:2rem;color:var(--acid);margin-bottom:1.5rem;}}
-.detail-price .old{{font-size:1.2rem;color:var(--fg-muted);text-decoration:line-through;margin-left:0.5rem;}}
-.size-label{{
+}
+.detail-img{max-height:280px;object-fit:contain;filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));}
+.detail-name{font-family:var(--font-display);font-size:2.5rem;line-height:1;margin-bottom:0.5rem;}
+.detail-price{font-family:var(--font-display);font-size:2rem;color:var(--acid);margin-bottom:1.5rem;}
+.detail-price .old{font-size:1.2rem;color:var(--fg-muted);text-decoration:line-through;margin-left:0.5rem;}
+.size-label{
   font-family:var(--font-cond);font-weight:700;font-size:0.78rem;
   text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-muted);
   margin-bottom:0.6rem;
-}}
-.sizes{{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}}
-.size-btn{{
+}
+.sizes{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.size-btn{
   width:2.5rem;height:2.5rem;border-radius:var(--r);
   border:1px solid var(--border2);
   font-family:var(--font-cond);font-weight:700;font-size:0.85rem;
   color:var(--fg-muted);cursor:pointer;transition:all 0.2s;
-}}
-.size-btn:hover,.size-btn.selected{{
+}
+.size-btn:hover,.size-btn.selected{
   background:var(--acid);color:var(--asphalt);border-color:var(--acid);
-}}
-.qty-wrap{{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;}}
-.qty-btn{{
+}
+.qty-wrap{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;}
+.qty-btn{
   width:2.2rem;height:2.2rem;border-radius:50%;
   background:var(--concrete);border:1px solid var(--border2);
   font-size:1.2rem;display:flex;align-items:center;justify-content:center;
   transition:all 0.2s;
-}}
-.qty-btn:hover{{background:var(--gravel);}}
-.qty-val{{
+}
+.qty-btn:hover{background:var(--gravel);}
+.qty-val{
   font-family:var(--font-display);font-size:1.5rem;
   min-width:2rem;text-align:center;
-}}
-.detail-features{{
+}
+.detail-features{
   background:var(--card2);border-radius:var(--r);padding:1rem;
   margin-top:1rem;
-}}
-.detail-features h4{{
+}
+.detail-features h4{
   font-family:var(--font-cond);font-weight:700;font-size:0.82rem;
   text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-muted);
   margin-bottom:0.6rem;
-}}
-.feature-tag{{
+}
+.feature-tag{
   display:inline-block;font-size:0.8rem;padding:0.2rem 0.6rem;
   background:var(--concrete);border-radius:4px;margin:0.2rem;
-}}
+}
 
 /* ═══════════════════════════════════════════════
    CATEGORIES SHOWCASE
    ═══════════════════════════════════════════════ */
-.categories-section{{padding:4rem 0;}}
-.cat-grid{{
+.categories-section{padding:4rem 0;}
+.cat-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:1rem;
-}}
-.cat-card{{
+}
+.cat-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);overflow:hidden;cursor:pointer;
   position:relative;height:200px;
   display:flex;align-items:flex-end;
   transition:transform 0.3s,box-shadow 0.3s;
-}}
-.cat-card:hover{{transform:scale(1.03);box-shadow:0 20px 40px rgba(0,0,0,0.5);}}
-.cat-card-bg{{
+}
+.cat-card:hover{transform:scale(1.03);box-shadow:0 20px 40px rgba(0,0,0,0.5);}
+.cat-card-bg{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:5rem;opacity:0.15;
   transition:transform 0.4s ease;
-}}
-.cat-card:hover .cat-card-bg{{transform:scale(1.2);}}
-.cat-card-body{{
+}
+.cat-card:hover .cat-card-bg{transform:scale(1.2);}
+.cat-card-body{
   position:relative;z-index:1;padding:1rem;width:100%;
   background:linear-gradient(transparent,rgba(0,0,0,0.8));
-}}
-.cat-card-name{{
+}
+.cat-card-name{
   font-family:var(--font-display);font-size:1.8rem;color:#fff;line-height:1;
-}}
-.cat-card-count{{
+}
+.cat-card-count{
   font-family:var(--font-cond);font-size:0.75rem;color:var(--acid);
   text-transform:uppercase;letter-spacing:0.1em;
-}}
+}
 /* color variants */
-.cat-shoes{{background:linear-gradient(135deg,#1a1a2e,#2d2d4e);}}
-.cat-shirts{{background:linear-gradient(135deg,#1e2a1e,#2a3d2a);}}
-.cat-trousers{{background:linear-gradient(135deg,#2a1a1a,#4e2d2d);}}
-.cat-necklaces{{background:linear-gradient(135deg,#2a2510,#4e4520);}}
+.cat-shoes{background:linear-gradient(135deg,#1a1a2e,#2d2d4e);}
+.cat-shirts{background:linear-gradient(135deg,#1e2a1e,#2a3d2a);}
+.cat-trousers{background:linear-gradient(135deg,#2a1a1a,#4e2d2d);}
+.cat-necklaces{background:linear-gradient(135deg,#2a2510,#4e4520);}
 
 /* ═══════════════════════════════════════════════
    CART DRAWER
    ═══════════════════════════════════════════════ */
-#cart-overlay{{
+#cart-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.7);
   z-index:7000;display:none;backdrop-filter:blur(4px);
-}}
-#cart-overlay.open{{display:block;}}
-#cart-drawer{{
+}
+#cart-overlay.open{display:block;}
+#cart-drawer{
   position:fixed;top:0;right:-480px;width:480px;max-width:100vw;
   height:100%;background:var(--card);
   border-left:1px solid var(--border2);
   z-index:7001;display:flex;flex-direction:column;
   transition:right 0.35s cubic-bezier(0.4,0,0.2,1);
-}}
-#cart-drawer.open{{right:0;}}
-.cart-drawer-head{{
+}
+#cart-drawer.open{right:0;}
+.cart-drawer-head{
   padding:1.5rem;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
   flex-shrink:0;
-}}
-.cart-title{{font-family:var(--font-display);font-size:2rem;}}
-.cart-body{{flex:1;overflow-y:auto;padding:1rem;}}
-.cart-empty{{
+}
+.cart-title{font-family:var(--font-display);font-size:2rem;}
+.cart-body{flex:1;overflow-y:auto;padding:1rem;}
+.cart-empty{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   height:100%;text-align:center;gap:1rem;color:var(--fg-muted);
-}}
-.cart-empty-icon{{font-size:4rem;opacity:0.3;}}
-.cart-item{{
+}
+.cart-empty-icon{font-size:4rem;opacity:0.3;}
+.cart-item{
   display:flex;gap:1rem;padding:1rem;
   background:var(--card2);border-radius:var(--r);
   margin-bottom:0.75rem;align-items:center;
-}}
-.cart-item-img{{
+}
+.cart-item-img{
   width:70px;height:70px;border-radius:8px;
   background:var(--gravel);overflow:hidden;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-}}
-.cart-item-img img{{width:60px;height:60px;object-fit:contain;}}
-.cart-item-info{{flex:1;}}
-.cart-item-name{{
+}
+.cart-item-img img{width:60px;height:60px;object-fit:contain;}
+.cart-item-info{flex:1;}
+.cart-item-name{
   font-family:var(--font-cond);font-weight:800;font-size:1rem;
   color:var(--fg);margin-bottom:0.2rem;
-}}
-.cart-item-meta{{font-size:0.78rem;color:var(--fg-muted);margin-bottom:0.5rem;}}
-.cart-item-controls{{display:flex;align-items:center;justify-content:space-between;}}
-.cart-item-price{{font-family:var(--font-display);font-size:1.2rem;color:var(--acid);}}
-.cart-qty{{display:flex;align-items:center;gap:0.5rem;}}
-.cq-btn{{
+}
+.cart-item-meta{font-size:0.78rem;color:var(--fg-muted);margin-bottom:0.5rem;}
+.cart-item-controls{display:flex;align-items:center;justify-content:space-between;}
+.cart-item-price{font-family:var(--font-display);font-size:1.2rem;color:var(--acid);}
+.cart-qty{display:flex;align-items:center;gap:0.5rem;}
+.cq-btn{
   width:1.6rem;height:1.6rem;border-radius:50%;
   background:var(--gravel);font-size:0.9rem;
   display:flex;align-items:center;justify-content:center;
   transition:background 0.2s;
-}}
-.cq-btn:hover{{background:var(--smoke);}}
-.cq-val{{font-family:var(--font-cond);font-weight:700;font-size:0.9rem;min-width:1.5rem;text-align:center;}}
-.remove-item{{color:var(--fg-muted);font-size:0.85rem;cursor:pointer;transition:color 0.2s;}}
-.remove-item:hover{{color:var(--danger);}}
-.cart-footer{{
+}
+.cq-btn:hover{background:var(--smoke);}
+.cq-val{font-family:var(--font-cond);font-weight:700;font-size:0.9rem;min-width:1.5rem;text-align:center;}
+.remove-item{color:var(--fg-muted);font-size:0.85rem;cursor:pointer;transition:color 0.2s;}
+.remove-item:hover{color:var(--danger);}
+.cart-footer{
   border-top:1px solid var(--border);padding:1.5rem;flex-shrink:0;
-}}
-.cart-totals{{margin-bottom:1rem;}}
-.cart-row{{
+}
+.cart-totals{margin-bottom:1rem;}
+.cart-row{
   display:flex;justify-content:space-between;
   font-family:var(--font-cond);font-size:0.9rem;color:var(--fg-muted);
   margin-bottom:0.5rem;
-}}
-.cart-row.total{{
+}
+.cart-row.total{
   font-size:1.2rem;color:var(--fg);font-weight:800;
   border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.5rem;
-}}
-.cart-row .val{{color:var(--acid);}}
-.delivery-note{{
+}
+.cart-row .val{color:var(--acid);}
+.delivery-note{
   font-size:0.78rem;color:var(--fg-muted);text-align:center;margin-bottom:1rem;
-}}
+}
 
 /* ═══════════════════════════════════════════════
    CHECKOUT PAGE
    ═══════════════════════════════════════════════ */
-.checkout-grid{{
+.checkout-grid{
   display:grid;grid-template-columns:1fr 380px;gap:2.5rem;
   padding:3rem 0;align-items:start;
-}}
-.checkout-section{{
+}
+.checkout-section{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);padding:1.75rem;
   margin-bottom:1.5rem;
-}}
-.checkout-section-title{{
+}
+.checkout-section-title{
   font-family:var(--font-display);font-size:1.6rem;
   margin-bottom:1.25rem;display:flex;align-items:center;gap:0.75rem;
-}}
-.checkout-num{{
+}
+.checkout-num{
   width:2rem;height:2rem;border-radius:50%;
   background:var(--acid);color:var(--asphalt);
   display:flex;align-items:center;justify-content:center;
   font-family:var(--font-cond);font-weight:800;font-size:0.9rem;
-}}
-.form-row{{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}}
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 /* Payment methods */
-.payment-methods{{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}}
-.pay-method{{
+.payment-methods{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.pay-method{
   flex:1;min-width:100px;
   border:2px solid var(--border2);border-radius:var(--r);
   padding:0.9rem 0.75rem;text-align:center;cursor:pointer;
   transition:all 0.2s;
-}}
-.pay-method:hover,.pay-method.selected{{border-color:var(--acid);background:rgba(212,240,0,0.06);}}
-.pay-method-icon{{font-size:1.5rem;margin-bottom:0.3rem;}}
-.pay-method-name{{
+}
+.pay-method:hover,.pay-method.selected{border-color:var(--acid);background:rgba(212,240,0,0.06);}
+.pay-method-icon{font-size:1.5rem;margin-bottom:0.3rem;}
+.pay-method-name{
   font-family:var(--font-cond);font-weight:700;font-size:0.75rem;
   text-transform:uppercase;letter-spacing:0.08em;color:var(--fg-muted);
-}}
-.pay-method.selected .pay-method-name{{color:var(--acid);}}
+}
+.pay-method.selected .pay-method-name{color:var(--acid);}
 /* Card fields */
-.card-fields{{display:none;}}
-.card-fields.show{{display:block;}}
+.card-fields{display:none;}
+.card-fields.show{display:block;}
 /* Order summary */
-.order-summary{{
+.order-summary{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);padding:1.75rem;
   position:sticky;top:calc(var(--nav-h) + 28px + 2rem);
-}}
-.order-summary-title{{font-family:var(--font-display);font-size:1.6rem;margin-bottom:1.5rem;}}
-.summary-items{{margin-bottom:1.5rem;max-height:240px;overflow-y:auto;}}
-.summary-item{{
+}
+.order-summary-title{font-family:var(--font-display);font-size:1.6rem;margin-bottom:1.5rem;}
+.summary-items{margin-bottom:1.5rem;max-height:240px;overflow-y:auto;}
+.summary-item{
   display:flex;align-items:center;gap:0.75rem;
   padding:0.6rem 0;border-bottom:1px solid var(--border);
-}}
-.summary-item-img{{
+}
+.summary-item-img{
   width:50px;height:50px;border-radius:8px;background:var(--card2);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}}
-.summary-item-img img{{width:42px;height:42px;object-fit:contain;}}
-.summary-item-name{{font-family:var(--font-cond);font-weight:700;font-size:0.88rem;flex:1;}}
-.summary-item-price{{font-family:var(--font-display);font-size:1rem;color:var(--acid);}}
-.summary-divider{{border:none;border-top:1px solid var(--border);margin:1rem 0;}}
-.summary-row{{
+}
+.summary-item-img img{width:42px;height:42px;object-fit:contain;}
+.summary-item-name{font-family:var(--font-cond);font-weight:700;font-size:0.88rem;flex:1;}
+.summary-item-price{font-family:var(--font-display);font-size:1rem;color:var(--acid);}
+.summary-divider{border:none;border-top:1px solid var(--border);margin:1rem 0;}
+.summary-row{
   display:flex;justify-content:space-between;align-items:center;
   font-family:var(--font-cond);font-size:0.9rem;color:var(--fg-muted);
   margin-bottom:0.6rem;
-}}
-.summary-row.grand{{
+}
+.summary-row.grand{
   font-size:1.3rem;color:var(--fg);font-weight:800;
   border-top:1px solid var(--border);padding-top:0.75rem;
-}}
-.summary-row .amt{{color:var(--acid);font-family:var(--font-display);font-size:1rem;}}
-.summary-row.grand .amt{{font-size:1.5rem;}}
+}
+.summary-row .amt{color:var(--acid);font-family:var(--font-display);font-size:1rem;}
+.summary-row.grand .amt{font-size:1.5rem;}
 /* Delivery selector */
-.delivery-options{{display:flex;gap:0.75rem;margin-bottom:1rem;}}
-.delivery-opt{{
+.delivery-options{display:flex;gap:0.75rem;margin-bottom:1rem;}
+.delivery-opt{
   flex:1;border:2px solid var(--border2);border-radius:var(--r);
   padding:0.9rem;cursor:pointer;transition:all 0.2s;
-}}
-.delivery-opt:hover,.delivery-opt.selected{{border-color:var(--acid);}}
-.delivery-opt-name{{
+}
+.delivery-opt:hover,.delivery-opt.selected{border-color:var(--acid);}
+.delivery-opt-name{
   font-family:var(--font-cond);font-weight:800;font-size:0.9rem;color:var(--fg);
-}}
-.delivery-opt-time{{font-size:0.75rem;color:var(--fg-muted);}}
-.delivery-opt-price{{
+}
+.delivery-opt-time{font-size:0.75rem;color:var(--fg-muted);}
+.delivery-opt-price{
   font-family:var(--font-display);font-size:1.1rem;color:var(--acid);margin-top:0.3rem;
-}}
+}
 
 /* ═══════════════════════════════════════════════
    ADMIN PANEL
    ═══════════════════════════════════════════════ */
-#page-admin{{background:var(--bg);}}
-.admin-layout{{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:calc(100vh - var(--nav-h) - 28px);}}
-.admin-sidebar{{
+#page-admin{background:var(--bg);}
+.admin-layout{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:calc(100vh - var(--nav-h) - 28px);}
+.admin-sidebar{
   background:var(--card);border-right:1px solid var(--border);
   padding:1.5rem;position:sticky;top:calc(var(--nav-h)+28px);
   height:calc(100vh - var(--nav-h) - 28px);overflow-y:auto;
-}}
-.admin-logo{{
+}
+.admin-logo{
   font-family:var(--font-display);font-size:1.5rem;
   color:var(--acid);margin-bottom:0.3rem;
-}}
-.admin-role{{
+}
+.admin-role{
   font-family:var(--font-cond);font-size:0.72rem;
   text-transform:uppercase;letter-spacing:0.15em;color:var(--fg-muted);
   margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border);
-}}
-.admin-nav{{display:flex;flex-direction:column;gap:0.25rem;}}
-.admin-nav-item{{
+}
+.admin-nav{display:flex;flex-direction:column;gap:0.25rem;}
+.admin-nav-item{
   display:flex;align-items:center;gap:0.75rem;
   font-family:var(--font-cond);font-weight:700;font-size:0.85rem;
   text-transform:uppercase;letter-spacing:0.08em;
   padding:0.65rem 0.9rem;border-radius:8px;cursor:pointer;
   color:var(--fg-muted);transition:all 0.2s;
-}}
-.admin-nav-item:hover,.admin-nav-item.active{{
+}
+.admin-nav-item:hover,.admin-nav-item.active{
   background:rgba(212,240,0,0.1);color:var(--acid);
-}}
-.admin-content{{padding:2rem;}}
-.admin-panel{{display:none;}}
-.admin-panel.active{{display:block;}}
+}
+.admin-content{padding:2rem;}
+.admin-panel{display:none;}
+.admin-panel.active{display:block;}
 /* Stats grid */
-.admin-stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}}
-.stat-card{{
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+.stat-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);padding:1.5rem;
-}}
-.stat-icon{{font-size:1.75rem;margin-bottom:0.75rem;}}
-.stat-val{{
+}
+.stat-icon{font-size:1.75rem;margin-bottom:0.75rem;}
+.stat-val{
   font-family:var(--font-display);font-size:2.2rem;color:var(--fg);margin-bottom:0.2rem;
-}}
-.stat-label{{
+}
+.stat-label{
   font-family:var(--font-cond);font-size:0.75rem;text-transform:uppercase;
   letter-spacing:0.1em;color:var(--fg-muted);
-}}
-.stat-change{{
+}
+.stat-change{
   font-family:var(--font-cond);font-size:0.8rem;margin-top:0.5rem;
-}}
-.stat-change.up{{color:var(--success);}}
-.stat-change.down{{color:var(--danger);}}
+}
+.stat-change.up{color:var(--success);}
+.stat-change.down{color:var(--danger);}
 /* Table */
-.data-table{{width:100%;border-collapse:collapse;}}
-.data-table th{{
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{
   font-family:var(--font-cond);font-weight:700;font-size:0.72rem;
   text-transform:uppercase;letter-spacing:0.12em;color:var(--fg-muted);
   padding:0.75rem 1rem;text-align:left;
   border-bottom:1px solid var(--border);white-space:nowrap;
-}}
-.data-table td{{
+}
+.data-table td{
   padding:1rem;font-size:0.88rem;
   border-bottom:1px solid var(--border);vertical-align:middle;
-}}
-.data-table tr:hover td{{background:rgba(255,255,255,0.02);}}
+}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
 /* Status badges */
-.status{{
+.status{
   display:inline-block;font-family:var(--font-cond);font-weight:700;
   font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;
   padding:0.25rem 0.65rem;border-radius:20px;
-}}
-.status-pending{{background:rgba(255,179,0,0.15);color:var(--warning);}}
-.status-confirmed{{background:rgba(0,200,150,0.15);color:var(--success);}}
-.status-shipped{{background:rgba(79,195,247,0.15);color:var(--sky);}}
-.status-delivered{{background:rgba(176,110,243,0.15);color:var(--violet);}}
-.status-cancelled{{background:rgba(255,77,77,0.15);color:var(--danger);}}
+}
+.status-pending{background:rgba(255,179,0,0.15);color:var(--warning);}
+.status-confirmed{background:rgba(0,200,150,0.15);color:var(--success);}
+.status-shipped{background:rgba(79,195,247,0.15);color:var(--sky);}
+.status-delivered{background:rgba(176,110,243,0.15);color:var(--violet);}
+.status-cancelled{background:rgba(255,77,77,0.15);color:var(--danger);}
 /* Order card in admin */
-.order-card{{
+.order-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--r2);padding:1.5rem;margin-bottom:1rem;
-}}
-.order-card-head{{
+}
+.order-card-head{
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;
-}}
-.order-id{{
+}
+.order-id{
   font-family:var(--font-display);font-size:1.3rem;color:var(--acid);
-}}
-.order-meta{{font-size:0.78rem;color:var(--fg-muted);}}
-.customer-info{{
+}
+.order-meta{font-size:0.78rem;color:var(--fg-muted);}
+.customer-info{
   background:var(--card2);border-radius:var(--r);padding:1rem;
   margin-bottom:1rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;
-}}
-.customer-field{{font-size:0.82rem;}}
-.customer-field span{{color:var(--fg-muted);font-size:0.72rem;display:block;}}
-.order-actions{{display:flex;gap:0.75rem;flex-wrap:wrap;}}
+}
+.customer-field{font-size:0.82rem;}
+.customer-field span{color:var(--fg-muted);font-size:0.72rem;display:block;}
+.order-actions{display:flex;gap:0.75rem;flex-wrap:wrap;}
 /* Invoice preview */
-.invoice{{
+.invoice{
   background:#fff;color:#333;padding:2.5rem;border-radius:var(--r);
   font-family:var(--font-body);font-size:0.9rem;
-}}
-.invoice-header{{display:flex;justify-content:space-between;margin-bottom:2rem;}}
-.invoice-brand{{font-size:2rem;font-weight:900;color:#1a1a1a;}}
-.invoice-brand span{{color:#d4f000;-webkit-text-stroke:1px #888;}}
-.invoice-table{{width:100%;border-collapse:collapse;margin:1.5rem 0;}}
-.invoice-table th,.invoice-table td{{
+}
+.invoice-header{display:flex;justify-content:space-between;margin-bottom:2rem;}
+.invoice-brand{font-size:2rem;font-weight:900;color:#1a1a1a;}
+.invoice-brand span{color:#d4f000;-webkit-text-stroke:1px #888;}
+.invoice-table{width:100%;border-collapse:collapse;margin:1.5rem 0;}
+.invoice-table th,.invoice-table td{
   padding:0.6rem 0.75rem;text-align:left;
   border-bottom:1px solid #eee;font-size:0.85rem;
-}}
-.invoice-table th{{background:#f5f5f5;font-weight:700;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.08em;}}
-.invoice-totals{{text-align:right;}}
-.invoice-totals .grand{{font-size:1.2rem;font-weight:900;color:#1a1a1a;}}
+}
+.invoice-table th{background:#f5f5f5;font-weight:700;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.08em;}
+.invoice-totals{text-align:right;}
+.invoice-totals .grand{font-size:1.2rem;font-weight:900;color:#1a1a1a;}
 
 /* ═══════════════════════════════════════════════
    TRACK ORDER PAGE
    ═══════════════════════════════════════════════ */
-.track-hero{{
+.track-hero{
   text-align:center;padding:5rem 0 3rem;
-}}
-.track-hero h1{{font-family:var(--font-display);font-size:clamp(3rem,7vw,6rem);}}
-.track-form{{
+}
+.track-hero h1{font-family:var(--font-display);font-size:clamp(3rem,7vw,6rem);}
+.track-form{
   max-width:500px;margin:0 auto 4rem;
   display:flex;gap:0.75rem;
-}}
-.track-timeline{{
+}
+.track-timeline{
   max-width:700px;margin:0 auto;
   display:flex;flex-direction:column;gap:0;
-}}
-.track-step{{
+}
+.track-step{
   display:flex;gap:1.5rem;align-items:flex-start;
   padding-bottom:2rem;position:relative;
-}}
-.track-step:not(:last-child)::after{{
+}
+.track-step:not(:last-child)::after{
   content:'';position:absolute;
   left:1.1rem;top:2.5rem;bottom:0;
   width:2px;background:var(--border);
-}}
-.track-step.done:not(:last-child)::after{{background:var(--acid);}}
-.track-dot{{
+}
+.track-step.done:not(:last-child)::after{background:var(--acid);}
+.track-dot{
   width:2.2rem;height:2.2rem;border-radius:50%;
   background:var(--concrete);border:2px solid var(--border2);
   display:flex;align-items:center;justify-content:center;
   font-size:0.9rem;flex-shrink:0;
   transition:all 0.3s;
-}}
-.track-step.done .track-dot{{background:var(--acid);border-color:var(--acid);color:var(--asphalt);}}
-.track-step-body{{flex:1;padding-top:0.1rem;}}
-.track-step-title{{font-family:var(--font-cond);font-weight:800;font-size:1rem;margin-bottom:0.2rem;}}
-.track-step-desc{{font-size:0.82rem;color:var(--fg-muted);}}
-.track-step-date{{font-size:0.72rem;color:var(--acid);}}
+}
+.track-step.done .track-dot{background:var(--acid);border-color:var(--acid);color:var(--asphalt);}
+.track-step-body{flex:1;padding-top:0.1rem;}
+.track-step-title{font-family:var(--font-cond);font-weight:800;font-size:1rem;margin-bottom:0.2rem;}
+.track-step-desc{font-size:0.82rem;color:var(--fg-muted);}
+.track-step-date{font-size:0.72rem;color:var(--acid);}
 
 /* ═══════════════════════════════════════════════
    LOOKBOOK
    ═══════════════════════════════════════════════ */
-.lookbook-section{{padding:5rem 0;}}
-.lookbook-grid{{
+.lookbook-section{padding:5rem 0;}
+.lookbook-grid{
   display:grid;grid-template-columns:1fr 1fr 1fr;
   grid-template-rows:auto auto;gap:1rem;
-}}
-.look-card{{
+}
+.look-card{
   background:var(--card2);border-radius:var(--r2);
   overflow:hidden;position:relative;cursor:pointer;
   transition:transform 0.3s;
-}}
-.look-card:hover{{transform:scale(1.02);}}
-.look-card.tall{{grid-row:span 2;}}
-.look-card-inner{{
+}
+.look-card:hover{transform:scale(1.02);}
+.look-card.tall{grid-row:span 2;}
+.look-card-inner{
   height:280px;display:flex;align-items:center;justify-content:center;
   font-size:6rem;background:var(--card2);
   transition:transform 0.4s;overflow:hidden;
-}}
-.look-card.tall .look-card-inner{{height:100%;}}
-.look-card:hover .look-card-inner{{transform:scale(1.05);}}
-.look-card-label{{
+}
+.look-card.tall .look-card-inner{height:100%;}
+.look-card:hover .look-card-inner{transform:scale(1.05);}
+.look-card-label{
   position:absolute;bottom:0;left:0;right:0;
   background:linear-gradient(transparent,rgba(0,0,0,0.85));
   padding:1.5rem 1.25rem 1rem;
-}}
-.look-card-label h3{{font-family:var(--font-display);font-size:1.6rem;}}
-.look-card-label p{{font-size:0.78rem;color:rgba(255,255,255,0.7);}}
+}
+.look-card-label h3{font-family:var(--font-display);font-size:1.6rem;}
+.look-card-label p{font-size:0.78rem;color:rgba(255,255,255,0.7);}
 
 /* ═══════════════════════════════════════════════
    NEWSLETTER
    ═══════════════════════════════════════════════ */
-.newsletter{{
+.newsletter{
   background:linear-gradient(135deg,rgba(212,240,0,0.08),rgba(224,92,42,0.05));
   border:1px solid rgba(212,240,0,0.12);
   border-radius:var(--r2);padding:4rem;text-align:center;margin:3rem 0;
-}}
-.newsletter h2{{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4rem);margin-bottom:0.75rem;}}
-.newsletter p{{color:var(--fg-muted);max-width:30rem;margin:0 auto 2rem;}}
-.newsletter-form{{max-width:400px;margin:0 auto;display:flex;gap:0.75rem;}}
+}
+.newsletter h2{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4rem);margin-bottom:0.75rem;}
+.newsletter p{color:var(--fg-muted);max-width:30rem;margin:0 auto 2rem;}
+.newsletter-form{max-width:400px;margin:0 auto;display:flex;gap:0.75rem;}
 
 /* ═══════════════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════════════ */
-footer{{
+footer{
   background:var(--card);border-top:1px solid var(--border);
   padding:4rem 0 2rem;
-}}
-.footer-grid{{
+}
+.footer-grid{
   display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;
   margin-bottom:3rem;
-}}
-.footer-logo{{
+}
+.footer-logo{
   font-family:var(--font-display);font-size:2.5rem;
   position:relative;display:inline-block;margin-bottom:1rem;
-}}
-.footer-logo .cn{{
+}
+.footer-logo .cn{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-cn);font-size:1rem;
   color:rgba(212,240,0,0.2);letter-spacing:0.08em;
   white-space:nowrap;pointer-events:none;
-}}
-.footer-desc{{color:var(--fg-muted);font-size:0.9rem;line-height:1.7;max-width:22rem;margin-bottom:1.5rem;}}
-.footer-socials{{display:flex;gap:0.75rem;}}
-.social-btn{{
+}
+.footer-desc{color:var(--fg-muted);font-size:0.9rem;line-height:1.7;max-width:22rem;margin-bottom:1.5rem;}
+.footer-socials{display:flex;gap:0.75rem;}
+.social-btn{
   width:2.2rem;height:2.2rem;border-radius:50%;
   background:var(--concrete);border:1px solid var(--border2);
   display:flex;align-items:center;justify-content:center;
   color:var(--fg-muted);font-size:0.9rem;
   transition:all 0.2s;
-}}
-.social-btn:hover{{background:var(--acid);color:var(--asphalt);border-color:var(--acid);}}
-.footer-col h4{{
+}
+.social-btn:hover{background:var(--acid);color:var(--asphalt);border-color:var(--acid);}
+.footer-col h4{
   font-family:var(--font-cond);font-weight:800;font-size:0.85rem;
   text-transform:uppercase;letter-spacing:0.15em;
   margin-bottom:1.25rem;color:var(--fg);
-}}
-.footer-col ul{{display:flex;flex-direction:column;gap:0.65rem;}}
-.footer-col a{{
+}
+.footer-col ul{display:flex;flex-direction:column;gap:0.65rem;}
+.footer-col a{
   font-size:0.88rem;color:var(--fg-muted);
   transition:color 0.2s;cursor:pointer;
-}}
-.footer-col a:hover{{color:var(--acid);}}
-.footer-bottom{{
+}
+.footer-col a:hover{color:var(--acid);}
+.footer-bottom{
   border-top:1px solid var(--border);padding-top:1.5rem;
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:1rem;
-}}
-.footer-bottom p{{font-size:0.82rem;color:var(--fg-muted);}}
-.footer-payments{{display:flex;gap:0.5rem;align-items:center;}}
-.pay-icon{{
+}
+.footer-bottom p{font-size:0.82rem;color:var(--fg-muted);}
+.footer-payments{display:flex;gap:0.5rem;align-items:center;}
+.pay-icon{
   background:var(--card2);border:1px solid var(--border);
   border-radius:4px;padding:0.2rem 0.5rem;
   font-family:var(--font-cond);font-weight:800;font-size:0.7rem;
   text-transform:uppercase;color:var(--fg-muted);
-}}
+}
 
 /* ═══════════════════════════════════════════════
    REVEAL ANIMATIONS
    ═══════════════════════════════════════════════ */
-.reveal{{opacity:0;transform:translateY(32px);transition:opacity 0.7s,transform 0.7s;}}
-.reveal.in{{opacity:1;transform:none;}}
-.reveal-l{{opacity:0;transform:translateX(-40px);transition:opacity 0.7s,transform 0.7s;}}
-.reveal-l.in{{opacity:1;transform:none;}}
-.reveal-r{{opacity:0;transform:translateX(40px);transition:opacity 0.7s,transform 0.7s;}}
-.reveal-r.in{{opacity:1;transform:none;}}
-.d1{{transition-delay:0.1s;}}.d2{{transition-delay:0.2s;}}.d3{{transition-delay:0.3s;}}
-.d4{{transition-delay:0.4s;}}.d5{{transition-delay:0.5s;}}.d6{{transition-delay:0.6s;}}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.7s,transform 0.7s;}
+.reveal.in{opacity:1;transform:none;}
+.reveal-l{opacity:0;transform:translateX(-40px);transition:opacity 0.7s,transform 0.7s;}
+.reveal-l.in{opacity:1;transform:none;}
+.reveal-r{opacity:0;transform:translateX(40px);transition:opacity 0.7s,transform 0.7s;}
+.reveal-r.in{opacity:1;transform:none;}
+.d1{transition-delay:0.1s;}.d2{transition-delay:0.2s;}.d3{transition-delay:0.3s;}
+.d4{transition-delay:0.4s;}.d5{transition-delay:0.5s;}.d6{transition-delay:0.6s;}
 
 /* ═══════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════ */
-@media(max-width:1024px){{
-  .admin-stats{{grid-template-columns:repeat(2,1fr);}}
-  .footer-grid{{grid-template-columns:1fr 1fr;}}
-  .cat-grid{{grid-template-columns:repeat(2,1fr);}}
-  .checkout-grid{{grid-template-columns:1fr;}}
-  .order-summary{{position:static;}}
-}}
-@media(max-width:768px){{
-  :root{{--nav-h:60px;}}
-  .nav-links,.nav-cats{{display:none;}}
-  .hamburger{{display:flex;}}
-  .hero-inner{{grid-template-columns:1fr;}}
-  .hero-visual{{display:none;}}
-  .product-detail{{grid-template-columns:1fr;}}
-  .admin-layout{{grid-template-columns:1fr;}}
-  .admin-sidebar{{display:none;}}
-  .form-row{{grid-template-columns:1fr;}}
-  .lookbook-grid{{grid-template-columns:1fr;}}
-  .footer-grid{{grid-template-columns:1fr;}}
-  .hero-stats{{gap:1.5rem;}}
-  .delivery-options{{flex-direction:column;}}
-}}
-@media(max-width:480px){{
-  .hero-h1{{font-size:3.5rem;}}
-  .section-header h2{{font-size:2.5rem;}}
-  .newsletter{{padding:2rem 1.25rem;}}
-  .newsletter-form{{flex-direction:column;}}
-  .cart-drawer{{width:100vw!important;}}
-  .admin-stats{{grid-template-columns:1fr;}}
-}}
+@media(max-width:1024px){
+  .admin-stats{grid-template-columns:repeat(2,1fr);}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  .cat-grid{grid-template-columns:repeat(2,1fr);}
+  .checkout-grid{grid-template-columns:1fr;}
+  .order-summary{position:static;}
+}
+@media(max-width:768px){
+  :root{--nav-h:60px;}
+  .nav-links,.nav-cats{display:none;}
+  .hamburger{display:flex;}
+  .hero-inner{grid-template-columns:1fr;}
+  .hero-visual{display:none;}
+  .product-detail{grid-template-columns:1fr;}
+  .admin-layout{grid-template-columns:1fr;}
+  .admin-sidebar{display:none;}
+  .form-row{grid-template-columns:1fr;}
+  .lookbook-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr;}
+  .hero-stats{gap:1.5rem;}
+  .delivery-options{flex-direction:column;}
+}
+@media(max-width:480px){
+  .hero-h1{font-size:3.5rem;}
+  .section-header h2{font-size:2.5rem;}
+  .newsletter{padding:2rem 1.25rem;}
+  .newsletter-form{flex-direction:column;}
+  .cart-drawer{width:100vw!important;}
+  .admin-stats{grid-template-columns:1fr;}
+}
 
 /* ─── CUSTOM CURSOR ──────────────────────────── */
-#cursor{{
+#cursor{
   width:10px;height:10px;border-radius:50%;
   background:var(--acid);
   position:fixed;pointer-events:none;z-index:99999;
   transform:translate(-50%,-50%);
   transition:width 0.2s,height 0.2s,opacity 0.2s;
-}}
-#cursor-ring{{
+}
+#cursor-ring{
   width:36px;height:36px;border-radius:50%;
   border:1.5px solid rgba(212,240,0,0.5);
   position:fixed;pointer-events:none;z-index:99998;
   transform:translate(-50%,-50%);
   transition:transform 0.12s ease,width 0.2s,height 0.2s;
-}}
-body:not(:hover) #cursor,body:not(:hover) #cursor-ring{{opacity:0;}}
+}
+body:not(:hover) #cursor,body:not(:hover) #cursor-ring{opacity:0;}
 
 /* ─── FLOATING CTA ───────────────────────────── */
-#floating-cta{{
+#floating-cta{
   position:fixed;bottom:2rem;left:2rem;z-index:2000;
   animation:floatCTA 3s ease-in-out infinite;
-}}
-@keyframes floatCTA{{0%,100%{{transform:translateY(0);}}50%{{transform:translateY(-6px);}}}}
+}
+@keyframes floatCTA{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 
 /* ─── BACK TO TOP ─────────────────────────────── */
-#back-top{{
+#back-top{
   position:fixed;bottom:2rem;right:6rem;z-index:2000;
   width:2.5rem;height:2.5rem;border-radius:50%;
   background:var(--concrete);border:1px solid var(--border2);
   display:none;align-items:center;justify-content:center;
   color:var(--fg-muted);cursor:pointer;transition:all 0.2s;
-}}
-#back-top.show{{display:flex;}}
-#back-top:hover{{background:var(--acid);color:var(--asphalt);border-color:var(--acid);}}
+}
+#back-top.show{display:flex;}
+#back-top:hover{background:var(--acid);color:var(--asphalt);border-color:var(--acid);}
 
 /* ─── SEARCH OVERLAY ─────────────────────────── */
-#search-overlay{{
+#search-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.92);
   z-index:9000;display:none;align-items:flex-start;
   justify-content:center;padding-top:15vh;
   backdrop-filter:blur(10px);
-}}
-#search-overlay.open{{display:flex;}}
-.search-box{{
+}
+#search-overlay.open{display:flex;}
+.search-box{
   width:100%;max-width:640px;padding:0 1.5rem;
-}}
-.search-input-wrap{{position:relative;}}
-.search-icon{{
+}
+.search-input-wrap{position:relative;}
+.search-icon{
   position:absolute;left:1rem;top:50%;transform:translateY(-50%);
   color:var(--fg-muted);font-size:1.2rem;pointer-events:none;
-}}
-.search-input{{
+}
+.search-input{
   width:100%;padding:1.25rem 1.25rem 1.25rem 3rem;
   background:var(--card);border:2px solid var(--acid);
   border-radius:var(--r);color:var(--fg);font-size:1.2rem;outline:none;
   font-family:var(--font-cond);font-weight:600;
-}}
-.search-results{{
+}
+.search-results{
   background:var(--card);border:1px solid var(--border2);
   border-radius:var(--r);margin-top:0.5rem;overflow:hidden;
   max-height:400px;overflow-y:auto;
-}}
-.search-result-item{{
+}
+.search-result-item{
   display:flex;align-items:center;gap:1rem;padding:0.85rem 1.2rem;
   cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.2s;
-}}
-.search-result-item:hover{{background:var(--card2);}}
-.search-result-img{{
+}
+.search-result-item:hover{background:var(--card2);}
+.search-result-img{
   width:48px;height:48px;background:var(--card2);border-radius:8px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}}
-.search-result-img img{{width:42px;height:42px;object-fit:contain;}}
+}
+.search-result-img img{width:42px;height:42px;object-fit:contain;}
 </style>
 </head>
 <body>
@@ -1533,7 +1533,7 @@ parts.append(f"""
 </div>
 
 <!-- BACK TO TOP -->
-<div id="back-top" onclick="window.scrollTo({{top:0,behavior:'smooth'}})">↑</div>
+<div id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 
 <!-- FLOATING CTA -->
 <div id="floating-cta">
@@ -2348,7 +2348,7 @@ parts.append(f"""
 // ═══════════════════════════════════════════════════════════════
 
 // ─── PRODUCT DATABASE ──────────────────────────────────────────
-const IMG = {{
+const IMG = {
   s1: 'data:image/png;base64,{s1}',
   s2: 'data:image/png;base64,{s2}',
   s3: 'data:image/png;base64,{s3}',
@@ -2356,105 +2356,105 @@ const IMG = {{
   s5: 'data:image/png;base64,{s5}',
   s6: 'data:image/png;base64,{s6}',
   hero: 'data:image/png;base64,{hero}',
-}};
+};
 
 const PRODUCTS = [
   // ── SHOES ──
-  {{id:'p001',cat:'shoes',name:'VELOCITY PRO',sub:'Runner',price:249,old:329,rating:4.8,reviews:312,img:'s1',
+  {id:'p001',cat:'shoes',name:'VELOCITY PRO',sub:'Runner',price:249,old:329,rating:4.8,reviews:312,img:'s1',
     badge:'HOT',badgeType:'rust',desc:'Engineered for speed, designed for the streets. Ultra-lightweight build with reactive cushioning.',
     sizes:['7','7.5','8','8.5','9','9.5','10','10.5','11','12'],
-    features:['Carbon Fiber Plate','React Foam','Reflective Detail','Unisex Fit'],isNew:false,isSale:true}},
-  {{id:'p002',cat:'shoes',name:'LUXE GOLD',sub:'Lifestyle',price:299,old:399,rating:4.9,reviews:218,img:'s2',
+    features:['Carbon Fiber Plate','React Foam','Reflective Detail','Unisex Fit'],isNew:false,isSale:true},
+  {id:'p002',cat:'shoes',name:'LUXE GOLD',sub:'Lifestyle',price:299,old:399,rating:4.9,reviews:218,img:'s2',
     badge:'LIMITED',badgeType:'acid',desc:'24k street royalty. Butter-soft leather upper with hand-stitched gold detailing.',
     sizes:['6','6.5','7','7.5','8','8.5','9','9.5','10','11'],
-    features:['Genuine Leather','Gold Detailing','Memory Foam Insole','Limited Run'],isNew:true,isSale:false}},
-  {{id:'p003',cat:'shoes',name:'RETRO FUSION',sub:'Heritage',price:189,old:259,rating:4.7,reviews:445,img:'s3',
+    features:['Genuine Leather','Gold Detailing','Memory Foam Insole','Limited Run'],isNew:true,isSale:false},
+  {id:'p003',cat:'shoes',name:'RETRO FUSION',sub:'Heritage',price:189,old:259,rating:4.7,reviews:445,img:'s3',
     badge:'',badgeType:'',desc:'Old school soul meets new school tech. Vintage silhouette with modern comfort.',
     sizes:['7','7.5','8','8.5','9','9.5','10','10.5','11'],
-    features:['Suede Upper','Gum Sole','Vintage Last','Foam Midsole'],isNew:false,isSale:true}},
-  {{id:'p004',cat:'shoes',name:'TRAIL BEAST',sub:'Performance',price:279,old:369,rating:4.6,reviews:187,img:'s4',
+    features:['Suede Upper','Gum Sole','Vintage Last','Foam Midsole'],isNew:false,isSale:true},
+  {id:'p004',cat:'shoes',name:'TRAIL BEAST',sub:'Performance',price:279,old:369,rating:4.6,reviews:187,img:'s4',
     badge:'NEW',badgeType:'sky',desc:'From concrete to mountain trail. Aggressive grip with street-ready style.',
     sizes:['7','8','8.5','9','9.5','10','10.5','11','12'],
-    features:['Vibram Sole','Gore-Tex Liner','Trail Guard','Water Resistant'],isNew:true,isSale:false}},
-  {{id:'p005',cat:'shoes',name:'SHADOW ELITE',sub:'Premium',price:219,old:299,rating:4.8,reviews:390,img:'s5',
+    features:['Vibram Sole','Gore-Tex Liner','Trail Guard','Water Resistant'],isNew:true,isSale:false},
+  {id:'p005',cat:'shoes',name:'SHADOW ELITE',sub:'Premium',price:219,old:299,rating:4.8,reviews:390,img:'s5',
     badge:'',badgeType:'',desc:'Move in silence. All-black everything with matte finish and tonal branding.',
     sizes:['6.5','7','7.5','8','8.5','9','9.5','10','11'],
-    features:['All-Black Colorway','TPU Cage','Air Sole','Tonal Laces'],isNew:false,isSale:false}},
-  {{id:'p006',cat:'shoes',name:'CYBER WAVE',sub:'Future',price:329,old:429,rating:4.9,reviews:156,img:'s6',
+    features:['All-Black Colorway','TPU Cage','Air Sole','Tonal Laces'],isNew:false,isSale:false},
+  {id:'p006',cat:'shoes',name:'CYBER WAVE',sub:'Future',price:329,old:429,rating:4.9,reviews:156,img:'s6',
     badge:'COLLAB',badgeType:'violet',desc:'Designed for the next generation. Exaggerated sole, neon accents, zero compromise.',
     sizes:['7','7.5','8','8.5','9','9.5','10','11'],
-    features:['Mega Sole','Neon Piping','Heat-Welded Upper','Cushlon 3.0'],isNew:true,isSale:false}},
+    features:['Mega Sole','Neon Piping','Heat-Welded Upper','Cushlon 3.0'],isNew:true,isSale:false},
   // ── SHIRTS ──
-  {{id:'p007',cat:'shirts',name:'AKTIVITY TEE',sub:'Classic',price:59,old:79,rating:4.8,reviews:623,img:'s1',
+  {id:'p007',cat:'shirts',name:'AKTIVITY TEE',sub:'Classic',price:59,old:79,rating:4.8,reviews:623,img:'s1',
     badge:'BESTSELLER',badgeType:'acid',desc:'The foundation piece. 100% heavyweight cotton with embroidered logo. Drop shoulder silhouette.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Heavyweight Cotton','Embroidered Logo','Drop Shoulder','Unisex'],isNew:false,isSale:false}},
-  {{id:'p008',cat:'shirts',name:'ACID WASH HEAVY',sub:'Statement',price:89,old:119,rating:4.7,reviews:289,img:'s2',
+    features:['Heavyweight Cotton','Embroidered Logo','Drop Shoulder','Unisex'],isNew:false,isSale:false},
+  {id:'p008',cat:'shirts',name:'ACID WASH HEAVY',sub:'Statement',price:89,old:119,rating:4.7,reviews:289,img:'s2',
     badge:'NEW',badgeType:'sky',desc:'Hand-finished acid wash on 400gsm French terry. Each piece is unique.',
     sizes:['S','M','L','XL','XXL'],
-    features:['400gsm French Terry','Hand Acid Washed','Oversized Fit','Unique Pattern'],isNew:true,isSale:false}},
-  {{id:'p009',cat:'shirts',name:'STREET FLANNEL',sub:'Layer',price:99,old:139,rating:4.6,reviews:178,img:'s3',
+    features:['400gsm French Terry','Hand Acid Washed','Oversized Fit','Unique Pattern'],isNew:true,isSale:false},
+  {id:'p009',cat:'shirts',name:'STREET FLANNEL',sub:'Layer',price:99,old:139,rating:4.6,reviews:178,img:'s3',
     badge:'',badgeType:'',desc:'Soft brushed flannel with oversized proportions. Double chest pocket.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Brushed Flannel','Oversized Cut','Double Pocket','Unisex'],isNew:false,isSale:true}},
-  {{id:'p010',cat:'shirts',name:'MESH TECH TEE',sub:'Sport',price:69,old:89,rating:4.8,reviews:412,img:'s4',
+    features:['Brushed Flannel','Oversized Cut','Double Pocket','Unisex'],isNew:false,isSale:true},
+  {id:'p010',cat:'shirts',name:'MESH TECH TEE',sub:'Sport',price:69,old:89,rating:4.8,reviews:412,img:'s4',
     badge:'',badgeType:'',desc:'Breathable engineered mesh construction. Athletic cut with street aesthetic.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Engineered Mesh','Moisture Wicking','Athletic Fit','Reflective Logo'],isNew:false,isSale:false}},
-  {{id:'p011',cat:'shirts',name:'VAULT JACKET',sub:'Outerwear',price:189,old:249,rating:4.9,reviews:234,img:'s5',
+    features:['Engineered Mesh','Moisture Wicking','Athletic Fit','Reflective Logo'],isNew:false,isSale:false},
+  {id:'p011',cat:'shirts',name:'VAULT JACKET',sub:'Outerwear',price:189,old:249,rating:4.9,reviews:234,img:'s5',
     badge:'LIMITED',badgeType:'rust',desc:'Nylon windbreaker with internal mesh lining. Packable into chest pocket.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Nylon Shell','Mesh Lined','Packable','Water Repellent'],isNew:true,isSale:false}},
-  {{id:'p012',cat:'shirts',name:'HERITAGE HOODIE',sub:'Essential',price:129,old:169,rating:4.9,reviews:889,img:'s6',
+    features:['Nylon Shell','Mesh Lined','Packable','Water Repellent'],isNew:true,isSale:false},
+  {id:'p012',cat:'shirts',name:'HERITAGE HOODIE',sub:'Essential',price:129,old:169,rating:4.9,reviews:889,img:'s6',
     badge:'BESTSELLER',badgeType:'acid',desc:'The hoodie that never goes out of style. Loopback cotton with kangaroo pocket.',
     sizes:['XS','S','M','L','XL','XXL','3XL'],
-    features:['Loopback Cotton','Ribbed Cuffs','Kangaroo Pocket','Enzyme Washed'],isNew:false,isSale:false}},
+    features:['Loopback Cotton','Ribbed Cuffs','Kangaroo Pocket','Enzyme Washed'],isNew:false,isSale:false},
   // ── TROUSERS ──
-  {{id:'p013',cat:'trousers',name:'CARGO COMMANDER',sub:'Street',price:139,old:179,rating:4.8,reviews:367,img:'s1',
+  {id:'p013',cat:'trousers',name:'CARGO COMMANDER',sub:'Street',price:139,old:179,rating:4.8,reviews:367,img:'s1',
     badge:'HOT',badgeType:'rust',desc:'10 pocket cargo with adjustable straps and zip ankles. The utility king.',
     sizes:['28','30','32','34','36','38'],
-    features:['10 Pockets','Adjustable Straps','Zip Ankles','Ripstop Fabric'],isNew:false,isSale:false}},
-  {{id:'p014',cat:'trousers',name:'SLIM STACK',sub:'Fitted',price:119,old:159,rating:4.7,reviews:245,img:'s2',
+    features:['10 Pockets','Adjustable Straps','Zip Ankles','Ripstop Fabric'],isNew:false,isSale:false},
+  {id:'p014',cat:'trousers',name:'SLIM STACK',sub:'Fitted',price:119,old:159,rating:4.7,reviews:245,img:'s2',
     badge:'',badgeType:'',desc:'Slim-fit cropped silhouette that stacks perfectly on any shoe. Stretch-woven.',
     sizes:['28','30','32','34','36'],
-    features:['4-Way Stretch','Stacked Fit','Cropped','YKK Zips'],isNew:true,isSale:false}},
-  {{id:'p015',cat:'trousers',name:'WIDE LEG DRIP',sub:'Relaxed',price:149,old:199,rating:4.8,reviews:412,img:'s3',
+    features:['4-Way Stretch','Stacked Fit','Cropped','YKK Zips'],isNew:true,isSale:false},
+  {id:'p015',cat:'trousers',name:'WIDE LEG DRIP',sub:'Relaxed',price:149,old:199,rating:4.8,reviews:412,img:'s3',
     badge:'NEW',badgeType:'sky',desc:'Ultra-wide leg silhouette in a polished twill. The pant that says everything.',
     sizes:['28','30','32','34','36','38','40'],
-    features:['Ultra Wide Leg','Twill Fabric','Relaxed Waist','Pressed Crease'],isNew:true,isSale:false}},
-  {{id:'p016',cat:'trousers',name:'TRACKSUIT BOTTOM',sub:'Sport',price:89,old:119,rating:4.9,reviews:678,img:'s4',
+    features:['Ultra Wide Leg','Twill Fabric','Relaxed Waist','Pressed Crease'],isNew:true,isSale:false},
+  {id:'p016',cat:'trousers',name:'TRACKSUIT BOTTOM',sub:'Sport',price:89,old:119,rating:4.9,reviews:678,img:'s4',
     badge:'BESTSELLER',badgeType:'acid',desc:'Premium terry tracksuit bottom with embroidered logo. Elasticated waist.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Terry Fabric','Elasticated Waist','Side Zip Pockets','Logo Embroidery'],isNew:false,isSale:true}},
-  {{id:'p017',cat:'trousers',name:'DENIM STREET',sub:'Classic',price:129,old:169,rating:4.7,reviews:523,img:'s5',
+    features:['Terry Fabric','Elasticated Waist','Side Zip Pockets','Logo Embroidery'],isNew:false,isSale:true},
+  {id:'p017',cat:'trousers',name:'DENIM STREET',sub:'Classic',price:129,old:169,rating:4.7,reviews:523,img:'s5',
     badge:'',badgeType:'',desc:'Straight-fit street denim, pre-washed for that lived-in look from day one.',
     sizes:['28','30','32','34','36','38'],
-    features:['Straight Fit','Pre-Washed','100% Cotton','Classic 5-Pocket'],isNew:false,isSale:false}},
-  {{id:'p018',cat:'trousers',name:'NYLON JOGGER',sub:'Active',price:109,old:149,rating:4.8,reviews:341,img:'s6',
+    features:['Straight Fit','Pre-Washed','100% Cotton','Classic 5-Pocket'],isNew:false,isSale:false},
+  {id:'p018',cat:'trousers',name:'NYLON JOGGER',sub:'Active',price:109,old:149,rating:4.8,reviews:341,img:'s6',
     badge:'',badgeType:'',desc:'Lightweight nylon jogger with tapered fit and bungee ankles. Sweat-proof.',
     sizes:['XS','S','M','L','XL','XXL'],
-    features:['Lightweight Nylon','Tapered Fit','Bungee Ankle','Quick Dry'],isNew:true,isSale:false}},
+    features:['Lightweight Nylon','Tapered Fit','Bungee Ankle','Quick Dry'],isNew:true,isSale:false},
   // ── NECKLACES ──
-  {{id:'p019',cat:'necklaces',name:'CUBAN LINK 18K',sub:'Heavy',price:189,old:249,rating:4.9,reviews:445,img:'s1',
+  {id:'p019',cat:'necklaces',name:'CUBAN LINK 18K',sub:'Heavy',price:189,old:249,rating:4.9,reviews:445,img:'s1',
     badge:'HOT',badgeType:'rust',desc:'18K gold-plated Cuban link chain. 8mm width, lobster clasp, tarnish-resistant.',
     sizes:['18"','20"','22"','24"'],
-    features:['18K Gold Plate','8mm Width','Tarnish Resistant','Lobster Clasp'],isNew:false,isSale:false}},
-  {{id:'p020',cat:'necklaces',name:'ROPE CHAIN SILVER',sub:'Classic',price:129,old:169,rating:4.8,reviews:312,img:'s2',
+    features:['18K Gold Plate','8mm Width','Tarnish Resistant','Lobster Clasp'],isNew:false,isSale:false},
+  {id:'p020',cat:'necklaces',name:'ROPE CHAIN SILVER',sub:'Classic',price:129,old:169,rating:4.8,reviews:312,img:'s2',
     badge:'',badgeType:'',desc:'Sterling silver rope chain. 925 silver, anti-tarnish coated. Stack it or wear alone.',
     sizes:['16"','18"','20"','22"','24"'],
-    features:['925 Silver','Anti-Tarnish','Rope Link','Stackable'],isNew:true,isSale:false}},
-  {{id:'p021',cat:'necklaces',name:'PENDANT DROP',sub:'Statement',price:159,old:219,rating:4.7,reviews:198,img:'s3',
+    features:['925 Silver','Anti-Tarnish','Rope Link','Stackable'],isNew:true,isSale:false},
+  {id:'p021',cat:'necklaces',name:'PENDANT DROP',sub:'Statement',price:159,old:219,rating:4.7,reviews:198,img:'s3',
     badge:'LIMITED',badgeType:'violet',desc:'Abstract geometric pendant on a box chain. Enamel filled, hand-finished.',
     sizes:['One Size'],
-    features:['Geometric Pendant','Enamel Fill','Box Chain','Hand Finished'],isNew:true,isSale:false}},
-  {{id:'p022',cat:'necklaces',name:'CROSS STACK',sub:'Layered',price:99,old:139,rating:4.8,reviews:567,img:'s4',
+    features:['Geometric Pendant','Enamel Fill','Box Chain','Hand Finished'],isNew:true,isSale:false},
+  {id:'p022',cat:'necklaces',name:'CROSS STACK',sub:'Layered',price:99,old:139,rating:4.8,reviews:567,img:'s4',
     badge:'BESTSELLER',badgeType:'acid',desc:'Three cross pendants at different lengths — designed to be worn together.',
     sizes:['One Size'],
-    features:['3-Piece Set','Mixed Metals','Layered Look','Gift Boxed'],isNew:false,isSale:true}},
-  {{id:'p023',cat:'necklaces',name:'DIAMOND CUT',sub:'Premium',price:219,old:289,rating:4.9,reviews:134,img:'s5',
+    features:['3-Piece Set','Mixed Metals','Layered Look','Gift Boxed'],isNew:false,isSale:true},
+  {id:'p023',cat:'necklaces',name:'DIAMOND CUT',sub:'Premium',price:219,old:289,rating:4.9,reviews:134,img:'s5',
     badge:'PREMIUM',badgeType:'sky',desc:'Diamond-cut ball chain with CZ stones set pendant. Rhodium plated over brass.',
     sizes:['18"','20"','22"'],
-    features:['CZ Stones','Diamond Cut','Rhodium Plate','Anti-Tarnish'],isNew:true,isSale:false}},
+    features:['CZ Stones','Diamond Cut','Rhodium Plate','Anti-Tarnish'],isNew:true,isSale:false},
 ];
 
 // ─── STATE ─────────────────────────────────────────────────────
@@ -2473,7 +2473,7 @@ let fbReady = false;
 let adminUser = null;
 let allOrders = [];
 
-const STATE_DELIVERY = {{
+const STATE_DELIVERY = {
   AL:8.99,AK:18.99,AZ:9.99,AR:8.99,CA:11.99,CO:10.99,CT:9.99,DE:8.99,
   FL:9.99,GA:9.99,HI:16.99,ID:10.99,IL:9.99,IN:8.99,IA:9.49,KS:9.49,
   KY:8.99,LA:9.99,ME:10.99,MD:9.49,MA:9.99,MI:9.49,MN:9.99,MS:9.49,
@@ -2481,134 +2481,134 @@ const STATE_DELIVERY = {{
   NC:9.49,ND:11.49,OH:8.99,OK:9.49,OR:11.49,PA:9.49,RI:9.99,SC:9.49,
   SD:11.49,TN:9.49,TX:10.49,UT:10.99,VT:10.99,VA:9.49,WA:11.49,WV:9.49,
   WI:9.49,WY:12.49
-}};
+};
 
 // ─── LOADER ────────────────────────────────────────────────────
-window.addEventListener('load',()=>{{
-  setTimeout(()=>{{
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
     document.getElementById('site-loader').style.opacity='0';
     document.getElementById('site-loader').style.transition='opacity 0.6s';
-    setTimeout(()=>{{
+    setTimeout(()=>{
       document.getElementById('site-loader').style.display='none';
       initReveal();
-    }},600);
-  }},1800);
+    },600);
+  },1800);
   initTicker();
   renderFeatured();
   renderShop();
   updateCartUI();
   initCursor();
   animatePromo();
-}});
+});
 
 // ─── FIREBASE READY ────────────────────────────────────────────
-window.addEventListener('fb-ready',()=>{{
+window.addEventListener('fb-ready',()=>{
   fbReady=true;
-  const {{auth,onAuthStateChanged}}=window._fb;
-  onAuthStateChanged(auth,user=>{{
+  const {auth,onAuthStateChanged}=window._fb;
+  onAuthStateChanged(auth,user=>{
     adminUser=user;
     if(user&&currentPage==='admin')showAdminPanel();
-  }});
-}});
+  });
+});
 
 // ─── NAVIGATION ────────────────────────────────────────────────
-function navigate(page){{
+function navigate(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(l=>{{
+  document.querySelectorAll('.nav-link').forEach(l=>{
     l.classList.toggle('active',l.dataset.page===page);
-  }});
+  });
   currentPage=page;
-  window.scrollTo({{top:0,behavior:'smooth'}});
+  window.scrollTo({top:0,behavior:'smooth'});
   if(page==='checkout')renderCheckout();
   if(page==='admin')checkAdminAuth();
-}}
+}
 
 // ─── TICKER ────────────────────────────────────────────────────
-function initTicker(){{
+function initTicker(){
   const items=['FREE SHIPPING OVER $150','NEW DROP FRIDAYS','AKTIV20 = 20% OFF','PREMIUM STREET CULTURE','UNISEX FITS','100% AUTHENTIC','WORLDWIDE SHIPPING','SECURE CHECKOUT'];
   const doubled=[...items,...items];
   const track=document.getElementById('ticker-track');
-  track.innerHTML=doubled.map(i=>`<span class="ticker-item"><span class="ticker-dot"></span>${{i}}</span>`).join('');
-}}
+  track.innerHTML=doubled.map(i=>`<span class="ticker-item"><span class="ticker-dot"></span>${i}</span>`).join('');
+}
 
 // ─── CURSOR ────────────────────────────────────────────────────
-function initCursor(){{
+function initCursor(){
   const c=document.getElementById('cursor');
   const r=document.getElementById('cursor-ring');
   let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove',e=>{{mx=e.clientX;my=e.clientY;c.style.left=mx+'px';c.style.top=my+'px';}});
-  (function animRing(){{
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx+'px';c.style.top=my+'px';});
+  (function animRing(){
     rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
     r.style.left=rx+'px';r.style.top=ry+'px';
     requestAnimationFrame(animRing);
-  }})();
-  document.querySelectorAll('button,a,.product-card,.cat-card').forEach(el=>{{
-    el.addEventListener('mouseenter',()=>{{c.style.width='18px';c.style.height='18px';r.style.width='54px';r.style.height='54px';}});
-    el.addEventListener('mouseleave',()=>{{c.style.width='10px';c.style.height='10px';r.style.width='36px';r.style.height='36px';}});
-  }});
-}}
+  })();
+  document.querySelectorAll('button,a,.product-card,.cat-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{c.style.width='18px';c.style.height='18px';r.style.width='54px';r.style.height='54px';});
+    el.addEventListener('mouseleave',()=>{c.style.width='10px';c.style.height='10px';r.style.width='36px';r.style.height='36px';});
+  });
+}
 
 // ─── PROMO COUNTER ─────────────────────────────────────────────
-function animatePromo(){{
+function animatePromo(){
   const el=document.getElementById('promo-pct');
   if(!el)return;
   let n=0;
-  const t=setInterval(()=>{{n+=2;el.textContent=n;if(n>=55)clearInterval(t);}},40);
-}}
+  const t=setInterval(()=>{n+=2;el.textContent=n;if(n>=55)clearInterval(t);},40);
+}
 
 // ─── REVEAL ────────────────────────────────────────────────────
-function initReveal(){{
-  const obs=new IntersectionObserver(entries=>{{
-    entries.forEach(e=>{{if(e.isIntersecting)e.target.classList.add('in');}});
-  }},{{threshold:0.1}});
+function initReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+  },{threshold:0.1});
   document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el=>obs.observe(el));
-}}
+}
 
 // ─── PRODUCT RENDER ────────────────────────────────────────────
-function productCardHTML(p){{
+function productCardHTML(p){
   const stars='★'.repeat(Math.round(p.rating))+'☆'.repeat(5-Math.round(p.rating));
-  const badge=p.badge?`<span class="badge badge-${{p.badgeType}}">${{p.badge}}</span>`:'';
+  const badge=p.badge?`<span class="badge badge-${p.badgeType}">${p.badge}</span>`:'';
   const newBadge=p.isNew?`<span class="badge badge-sky">NEW</span>`:'';
   const saleBadge=p.isSale?`<span class="badge badge-rust">SALE</span>`:'';
-  const oldPrice=p.old?`<span class="price-old">$${{p.old}}</span>`:'';
+  const oldPrice=p.old?`<span class="price-old">$${p.old}</span>`:'';
   const wl=wishlist.includes(p.id)?'active':'';
   return `
-  <div class="product-card reveal" onclick="openProduct('${{p.id}}')">
+  <div class="product-card reveal" onclick="openProduct('${p.id}')">
     <div class="product-card-img">
-      <div class="product-card-badges">${{badge}}${{newBadge}}${{saleBadge}}</div>
-      <img src="${{IMG[p.img]}}" alt="${{p.name}}" loading="lazy"/>
-      <button class="wishlist-btn ${{wl}}" onclick="event.stopPropagation();toggleWishlistItem('${{p.id}}')" title="Wishlist">♡</button>
+      <div class="product-card-badges">${badge}${newBadge}${saleBadge}</div>
+      <img src="${IMG[p.img]}" alt="${p.name}" loading="lazy"/>
+      <button class="wishlist-btn ${wl}" onclick="event.stopPropagation();toggleWishlistItem('${p.id}')" title="Wishlist">♡</button>
       <div class="product-card-actions">
-        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();quickAdd('${{p.id}}')">+ Quick Add</button>
-        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openProduct('${{p.id}}')">View</button>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();quickAdd('${p.id}')">+ Quick Add</button>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openProduct('${p.id}')">View</button>
       </div>
     </div>
     <div class="product-card-body">
-      <div class="product-card-cat">${{p.sub}} · ${{p.cat.toUpperCase()}}</div>
-      <div class="product-card-name">${{p.name}}</div>
+      <div class="product-card-cat">${p.sub} · ${p.cat.toUpperCase()}</div>
+      <div class="product-card-name">${p.name}</div>
       <div class="product-card-rating">
-        <span class="stars">${{stars}}</span>
-        <span class="rating-count">(${{p.reviews}})</span>
+        <span class="stars">${stars}</span>
+        <span class="rating-count">(${p.reviews})</span>
       </div>
       <div class="product-card-footer">
-        <div><span class="price">$${{p.price}}</span>${{oldPrice}}</div>
-        <button class="add-btn" onclick="event.stopPropagation();quickAdd('${{p.id}}')">+</button>
+        <div><span class="price">$${p.price}</span>${oldPrice}</div>
+        <button class="add-btn" onclick="event.stopPropagation();quickAdd('${p.id}')">+</button>
       </div>
     </div>
   </div>`;
-}}
+}
 
-function renderFeatured(){{
+function renderFeatured(){
   const featured=PRODUCTS.filter(p=>p.isSale||p.isNew||p.badge).slice(0,6);
   document.getElementById('featured-grid').innerHTML=featured.map(productCardHTML).join('');
   initReveal();
-}}
+}
 
 let shopFilter_cat='all';
 let shopFilter_sort='default';
 
-function renderShop(){{
+function renderShop(){
   let list=[...PRODUCTS];
   if(shopFilter_cat!=='all')list=list.filter(p=>p.cat===shopFilter_cat);
   if(shopFilter_sort==='price-asc')list.sort((a,b)=>a.price-b.price);
@@ -2617,30 +2617,30 @@ function renderShop(){{
   else if(shopFilter_sort==='new')list.sort((a,b)=>b.isNew-a.isNew);
   document.getElementById('shop-grid').innerHTML=list.map(productCardHTML).join('');
   initReveal();
-}}
+}
 
-function shopFilter(cat,el){{
+function shopFilter(cat,el){
   shopFilter_cat=cat;currentCat=cat;
   document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
   if(el)el.classList.add('active');
   renderShop();
-}}
+}
 
-function sortProducts(){{
+function sortProducts(){
   shopFilter_sort=document.getElementById('shop-sort').value;
   renderShop();
-}}
+}
 
-function filterCat(cat){{
+function filterCat(cat){
   shopFilter_cat=cat;currentCat=cat;
   document.querySelectorAll('.cat-pill').forEach(p=>p.classList.toggle('active',p.dataset.cat===cat));
   const tabs=document.querySelectorAll('.filter-tab');
   tabs.forEach(t=>t.classList.toggle('active',t.dataset.cat===cat));
   renderShop();
-}}
+}
 
 // ─── PRODUCT MODAL ─────────────────────────────────────────────
-function openProduct(id){{
+function openProduct(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
   selectedProduct=p;
@@ -2649,241 +2649,241 @@ function openProduct(id){{
   document.getElementById('detail-img').src=IMG[p.img];
   document.getElementById('detail-name').textContent=p.name;
   document.getElementById('detail-stars').textContent='★'.repeat(Math.round(p.rating));
-  document.getElementById('detail-rating-count').textContent=`${{p.reviews}} reviews`;
-  document.getElementById('detail-price').innerHTML=`$${{p.price}}`+(p.old?`<span class="old">$${{p.old}}</span>`:'');
+  document.getElementById('detail-rating-count').textContent=`${p.reviews} reviews`;
+  document.getElementById('detail-price').innerHTML=`$${p.price}`+(p.old?`<span class="old">$${p.old}</span>`:'');
   document.getElementById('detail-desc').textContent=p.desc;
   document.getElementById('detail-qty').textContent='1';
   const badges=document.getElementById('detail-badges');
-  badges.innerHTML=(p.badge?`<span class="badge badge-${{p.badgeType}}">${{p.badge}}</span> `:'')+
+  badges.innerHTML=(p.badge?`<span class="badge badge-${p.badgeType}">${p.badge}</span> `:'')+
     (p.isNew?'<span class="badge badge-sky">NEW</span> ':'')+
     (p.isSale?'<span class="badge badge-rust">SALE</span>':'');
   const sizesEl=document.getElementById('detail-sizes');
-  if(p.sizes&&p.sizes.length>0){{
+  if(p.sizes&&p.sizes.length>0){
     document.getElementById('detail-size-wrap').style.display='block';
-    sizesEl.innerHTML=p.sizes.map(s=>`<button class="size-btn" onclick="selectSize(this,'${{s}}')">${{s}}</button>`).join('');
-  }}else{{
+    sizesEl.innerHTML=p.sizes.map(s=>`<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`).join('');
+  }else{
     document.getElementById('detail-size-wrap').style.display='none';
-  }}
+  }
   document.getElementById('detail-features').innerHTML=`<h4>Features</h4>`+
-    p.features.map(f=>`<span class="feature-tag">${{f}}</span>`).join('');
+    p.features.map(f=>`<span class="feature-tag">${f}</span>`).join('');
   document.getElementById('product-modal').classList.add('open');
-}}
+}
 
-function selectSize(btn,s){{
+function selectSize(btn,s){
   document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   selectedSize=s;
-}}
+}
 
-function changeQty(d){{
+function changeQty(d){
   detailQty=Math.max(1,detailQty+d);
   document.getElementById('detail-qty').textContent=detailQty;
-}}
+}
 
-function addToCartFromModal(){{
+function addToCartFromModal(){
   if(!selectedProduct)return;
-  if(selectedProduct.sizes&&selectedProduct.sizes.length>1&&!selectedSize){{
+  if(selectedProduct.sizes&&selectedProduct.sizes.length>1&&!selectedSize){
     toast('Please select a size','error');return;
-  }}
+  }
   addToCart(selectedProduct,selectedSize,detailQty);
   closeModal('product-modal');
-}}
+}
 
-function addToWishlistFromModal(){{
+function addToWishlistFromModal(){
   if(!selectedProduct)return;
   toggleWishlistItem(selectedProduct.id);
-}}
+}
 
-function quickAdd(id){{
+function quickAdd(id){
   const p=PRODUCTS.find(x=>x.id===id);
   if(!p)return;
-  if(p.sizes&&p.sizes.length>1){{
+  if(p.sizes&&p.sizes.length>1){
     openProduct(id);toast('Please select your size','info');return;
-  }}
+  }
   addToCart(p,p.sizes?.[0]||'One Size',1);
-}}
+}
 
 // ─── CART ──────────────────────────────────────────────────────
-function addToCart(product,size,qty=1){{
+function addToCart(product,size,qty=1){
   const key=product.id+'-'+(size||'');
   const existing=cart.find(i=>i.key===key);
   if(existing)existing.qty+=qty;
-  else cart.push({{key,id:product.id,name:product.name,price:product.price,img:product.img,size,qty,cat:product.cat}});
+  else cart.push({key,id:product.id,name:product.name,price:product.price,img:product.img,size,qty,cat:product.cat});
   saveCart();updateCartUI();
-  toast(`${{product.name}} added to bag ✓`,'success');
+  toast(`${product.name} added to bag ✓`,'success');
   // bump
   const badge=document.getElementById('cart-count');
   badge.classList.add('bump');
   setTimeout(()=>badge.classList.remove('bump'),300);
-}}
+}
 
-function removeFromCart(key){{
+function removeFromCart(key){
   cart=cart.filter(i=>i.key!==key);
   saveCart();updateCartUI();renderCartDrawer();
-}}
+}
 
-function changeCartQty(key,d){{
+function changeCartQty(key,d){
   const item=cart.find(i=>i.key===key);
   if(!item)return;
   item.qty=Math.max(1,item.qty+d);
   if(item.qty===0)removeFromCart(key);
-  else{{saveCart();updateCartUI();renderCartDrawer();}}
-}}
+  else{saveCart();updateCartUI();renderCartDrawer();}
+}
 
-function saveCart(){{localStorage.setItem('aktivity_cart',JSON.stringify(cart));}}
+function saveCart(){localStorage.setItem('aktivity_cart',JSON.stringify(cart));}
 
-function updateCartUI(){{
+function updateCartUI(){
   const total=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=total;
-  document.getElementById('cart-total-count').textContent=`(${{total}})`;
+  document.getElementById('cart-total-count').textContent=`(${total})`;
   renderCartDrawer();
-}}
+}
 
-function renderCartDrawer(){{
+function renderCartDrawer(){
   const body=document.getElementById('cart-body');
   const footer=document.getElementById('cart-footer');
-  if(cart.length===0){{
+  if(cart.length===0){
     body.innerHTML=`<div class="cart-empty"><div class="cart-empty-icon">🛍️</div><div style="font-family:var(--font-cond);font-size:1.1rem;">Your bag is empty</div><p class="text-muted" style="font-size:0.85rem;">Add some fire pieces</p><button class="btn btn-primary" onclick="navigate('shop');toggleCart()">Shop Now</button></div>`;
     footer.style.display='none';return;
-  }}
+  }
   footer.style.display='block';
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   body.innerHTML=cart.map(item=>`
     <div class="cart-item">
-      <div class="cart-item-img"><img src="${{IMG[item.img]}}" alt="${{item.name}}"/></div>
+      <div class="cart-item-img"><img src="${IMG[item.img]}" alt="${item.name}"/></div>
       <div class="cart-item-info">
-        <div class="cart-item-name">${{item.name}}</div>
-        <div class="cart-item-meta">${{item.cat.toUpperCase()}}${{item.size?' · '+item.size:''}}</div>
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-meta">${item.cat.toUpperCase()}${item.size?' · '+item.size:''}</div>
         <div class="cart-item-controls">
           <div class="cart-qty">
-            <button class="cq-btn" onclick="changeCartQty('${{item.key}}',-1)">−</button>
-            <span class="cq-val">${{item.qty}}</span>
-            <button class="cq-btn" onclick="changeCartQty('${{item.key}}',1)">+</button>
+            <button class="cq-btn" onclick="changeCartQty('${item.key}',-1)">−</button>
+            <span class="cq-val">${item.qty}</span>
+            <button class="cq-btn" onclick="changeCartQty('${item.key}',1)">+</button>
           </div>
-          <div class="cart-item-price">$${{(item.price*item.qty).toFixed(2)}}</div>
-          <span class="remove-item" onclick="removeFromCart('${{item.key}}')">✕</span>
+          <div class="cart-item-price">$${(item.price*item.qty).toFixed(2)}</div>
+          <span class="remove-item" onclick="removeFromCart('${item.key}')">✕</span>
         </div>
       </div>
     </div>`).join('');
   document.getElementById('cart-sub').textContent='$'+sub.toFixed(2);
   document.getElementById('cart-grand').textContent='$'+sub.toFixed(2);
-}}
+}
 
-function toggleCart(){{
+function toggleCart(){
   document.getElementById('cart-drawer').classList.toggle('open');
   document.getElementById('cart-overlay').classList.toggle('open');
-}}
+}
 
 // ─── WISHLIST ──────────────────────────────────────────────────
-function toggleWishlistItem(id){{
+function toggleWishlistItem(id){
   if(wishlist.includes(id))wishlist=wishlist.filter(x=>x!==id);
   else wishlist.push(id);
   localStorage.setItem('aktivity_wishlist',JSON.stringify(wishlist));
-  document.querySelectorAll('.wishlist-btn').forEach(btn=>{{
+  document.querySelectorAll('.wishlist-btn').forEach(btn=>{
     const card=btn.closest('.product-card');
-  }});
+  });
   renderFeatured();renderShop();
   toast(wishlist.includes(id)?'Added to wishlist ♡':'Removed from wishlist','info');
-}}
-function toggleWishlist(){{toast(`You have ${{wishlist.length}} item(s) in your wishlist`,'info');}}
+}
+function toggleWishlist(){toast(`You have ${wishlist.length} item(s) in your wishlist`,'info');}
 
 // ─── SEARCH ────────────────────────────────────────────────────
-function openSearch(){{document.getElementById('search-overlay').classList.add('open');document.getElementById('search-input').value='';document.getElementById('search-results').innerHTML='';setTimeout(()=>document.getElementById('search-input').focus(),100);}}
-function closeSearch(e){{if(e.target.id==='search-overlay')document.getElementById('search-overlay').classList.remove('open');}}
-document.addEventListener('keydown',e=>{{if(e.key==='Escape'){{document.getElementById('search-overlay').classList.remove('open');closeModal('product-modal');}}}});
-function doSearch(q){{
-  if(!q){{document.getElementById('search-results').innerHTML='';return;}}
+function openSearch(){document.getElementById('search-overlay').classList.add('open');document.getElementById('search-input').value='';document.getElementById('search-results').innerHTML='';setTimeout(()=>document.getElementById('search-input').focus(),100);}
+function closeSearch(e){if(e.target.id==='search-overlay')document.getElementById('search-overlay').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('search-overlay').classList.remove('open');closeModal('product-modal');}});
+function doSearch(q){
+  if(!q){document.getElementById('search-results').innerHTML='';return;}
   const results=PRODUCTS.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.cat.toLowerCase().includes(q.toLowerCase())||p.sub.toLowerCase().includes(q.toLowerCase())).slice(0,8);
   document.getElementById('search-results').innerHTML=results.length?results.map(p=>`
-    <div class="search-result-item" onclick="document.getElementById('search-overlay').classList.remove('open');openProduct('${{p.id}}')">
-      <div class="search-result-img"><img src="${{IMG[p.img]}}" alt="${{p.name}}"/></div>
+    <div class="search-result-item" onclick="document.getElementById('search-overlay').classList.remove('open');openProduct('${p.id}')">
+      <div class="search-result-img"><img src="${IMG[p.img]}" alt="${p.name}"/></div>
       <div style="flex:1;">
-        <div style="font-family:var(--font-cond);font-weight:700;">${{p.name}}</div>
-        <div style="font-size:0.78rem;color:var(--fg-muted);">${{p.cat.toUpperCase()}} · $${{p.price}}</div>
+        <div style="font-family:var(--font-cond);font-weight:700;">${p.name}</div>
+        <div style="font-size:0.78rem;color:var(--fg-muted);">${p.cat.toUpperCase()} · $${p.price}</div>
       </div>
     </div>`).join(''):'<div style="padding:1.5rem;text-align:center;color:var(--fg-muted);font-family:var(--font-cond);">No results found</div>';
-}}
+}
 
 // ─── MOBILE NAV ────────────────────────────────────────────────
-function toggleMobileNav(){{
+function toggleMobileNav(){
   const m=document.getElementById('mobile-nav');
   const h=document.getElementById('hamburger');
   m.classList.toggle('open');h.classList.toggle('open');
-}}
-function closeMobileNav(){{
+}
+function closeMobileNav(){
   document.getElementById('mobile-nav').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
-}}
+}
 
 // ─── MODAL ─────────────────────────────────────────────────────
-function closeModal(id){{document.getElementById(id).classList.remove('open');}}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 // ─── CHECKOUT ──────────────────────────────────────────────────
-function renderCheckout(){{
+function renderCheckout(){
   const items=document.getElementById('checkout-items');
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   items.innerHTML=cart.map(i=>`
     <div class="summary-item">
-      <div class="summary-item-img"><img src="${{IMG[i.img]}}" alt="${{i.name}}"/></div>
-      <div class="summary-item-name">${{i.name}}<br><span style="font-size:0.72rem;color:var(--fg-muted);">${{i.size||''}} × ${{i.qty}}</span></div>
-      <div class="summary-item-price">$${{(i.price*i.qty).toFixed(2)}}</div>
+      <div class="summary-item-img"><img src="${IMG[i.img]}" alt="${i.name}"/></div>
+      <div class="summary-item-name">${i.name}<br><span style="font-size:0.72rem;color:var(--fg-muted);">${i.size||''} × ${i.qty}</span></div>
+      <div class="summary-item-price">$${(i.price*i.qty).toFixed(2)}</div>
     </div>`).join('');
   document.getElementById('sum-sub').textContent='$'+sub.toFixed(2);
   document.getElementById('sum-del').textContent='Select state above';
   document.getElementById('sum-disc').textContent='-$'+(discount).toFixed(2);
   updateCheckoutTotal();
-}}
+}
 
-function updateDeliveryFee(){{
+function updateDeliveryFee(){
   const state=document.getElementById('co-state').value;
   const base=STATE_DELIVERY[state]||0;
-  const mods={{standard:0,express:8,overnight:18}};
+  const mods={standard:0,express:8,overnight:18};
   deliveryFee=base+(mods[deliveryMode]||0);
   document.getElementById('del-std-price').textContent='$'+(base).toFixed(2);
   document.getElementById('del-exp-price').textContent='$'+(base+8).toFixed(2);
   document.getElementById('del-ovn-price').textContent='$'+(base+18).toFixed(2);
   document.getElementById('sum-del').textContent='$'+deliveryFee.toFixed(2);
   updateCheckoutTotal();
-}}
+}
 
-function selectDelivery(mode){{
+function selectDelivery(mode){
   deliveryMode=mode;
   document.querySelectorAll('.delivery-opt').forEach(o=>o.classList.remove('selected'));
   document.getElementById('del-'+mode).classList.add('selected');
   updateDeliveryFee();
-}}
+}
 
-function selectPayment(method,el){{
+function selectPayment(method,el){
   paymentMethod=method;
   document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('selected'));
   if(el)el.classList.add('selected');
   const cf=document.getElementById('card-fields');
   const alt=document.getElementById('alt-pay-msg');
-  if(method==='card'){{cf.classList.add('show');alt.style.display='none';}}
-  else{{
+  if(method==='card'){cf.classList.add('show');alt.style.display='none';}
+  else{
     cf.classList.remove('show');alt.style.display='block';
-    const msgs={{paypal:'You will be redirected to PayPal to complete payment.',apple:'Tap the Apple Pay button on your device to complete payment.',crypto:'Send payment to our crypto wallet. Address provided after order placement.',bank:'Bank transfer details will be emailed after order placement.'}};
+    const msgs={paypal:'You will be redirected to PayPal to complete payment.',apple:'Tap the Apple Pay button on your device to complete payment.',crypto:'Send payment to our crypto wallet. Address provided after order placement.',bank:'Bank transfer details will be emailed after order placement.'};
     alt.textContent=msgs[method]||'';
-  }}
-}}
+  }
+}
 
-function applyPromo(){{
+function applyPromo(){
   const code=(document.getElementById('promo-code-input')?.value||document.getElementById('coupon-input')?.value||'').trim().toUpperCase();
-  const valid={{'AKTIV20':0.20,'STREET10':0.10,'VIP30':0.30,'NEWKID15':0.15}};
-  if(valid[code]){{
+  const valid={'AKTIV20':0.20,'STREET10':0.10,'VIP30':0.30,'NEWKID15':0.15};
+  if(valid[code]){
     const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
     discount=sub*valid[code];
-    toast(`Code ${{code}} applied! ${{(valid[code]*100).toFixed(0)}}% off 🎉`,'success');
-    document.getElementById('promo-msg').innerHTML=`<span style="color:var(--success);">✓ Code applied — $${{discount.toFixed(2)}} saved</span>`;
-  }}else{{
+    toast(`Code ${code} applied! ${(valid[code]*100).toFixed(0)}% off 🎉`,'success');
+    document.getElementById('promo-msg').innerHTML=`<span style="color:var(--success);">✓ Code applied — $${discount.toFixed(2)} saved</span>`;
+  }else{
     discount=0;
     toast('Invalid promo code','error');
     document.getElementById('promo-msg').innerHTML=`<span style="color:var(--danger);">✗ Invalid code</span>`;
-  }}
+  }
   updateCheckoutTotal();
-}}
+}
 
-function updateCheckoutTotal(){{
+function updateCheckoutTotal(){
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const total=Math.max(0,sub+deliveryFee-discount);
   document.getElementById('sum-sub').textContent='$'+sub.toFixed(2);
@@ -2891,20 +2891,20 @@ function updateCheckoutTotal(){{
   document.getElementById('sum-total').textContent='$'+total.toFixed(2);
   document.getElementById('cart-sub').textContent='$'+sub.toFixed(2);
   document.getElementById('cart-grand').textContent='$'+(sub+deliveryFee).toFixed(2);
-}}
+}
 
-function formatCard(input){{
+function formatCard(input){
   let v=input.value.replace(/\\D/g,'').slice(0,16);
-  input.value=v.replace(/(\\d{{4}})/g,'$1 ').trim();
-}}
-function formatExpiry(input){{
+  input.value=v.replace(/(\\d{4})/g,'$1 ').trim();
+}
+function formatExpiry(input){
   let v=input.value.replace(/\\D/g,'');
   if(v.length>=3)v=v.slice(0,2)+'/'+v.slice(2,4);
   input.value=v;
-}}
+}
 
 // ─── PLACE ORDER ───────────────────────────────────────────────
-async function placeOrder(){{
+async function placeOrder(){
   const fname=document.getElementById('co-fname').value.trim();
   const lname=document.getElementById('co-lname').value.trim();
   const email=document.getElementById('co-email').value.trim();
@@ -2913,39 +2913,39 @@ async function placeOrder(){{
   const city=document.getElementById('co-city').value.trim();
   const state=document.getElementById('co-state').value;
   const zip=document.getElementById('co-zip').value.trim();
-  if(!fname||!lname||!email||!phone||!address||!city||!state||!zip){{
+  if(!fname||!lname||!email||!phone||!address||!city||!state||!zip){
     toast('Please fill in all required fields','error');return;
-  }}
-  if(cart.length===0){{toast('Your cart is empty!','error');return;}}
-  if(paymentMethod==='card'){{
+  }
+  if(cart.length===0){toast('Your cart is empty!','error');return;}
+  if(paymentMethod==='card'){
     const cardNum=document.getElementById('co-card-num').value.replace(/\\s/g,'');
     const cardExp=document.getElementById('co-card-exp').value;
     const cardCvv=document.getElementById('co-card-cvv').value;
-    if(cardNum.length<16||!cardExp||!cardCvv){{toast('Please complete card details','error');return;}}
-  }}
+    if(cardNum.length<16||!cardExp||!cardCvv){toast('Please complete card details','error');return;}
+  }
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const total=Math.max(0,sub+deliveryFee-discount);
   const orderId='AKT-'+Math.random().toString(36).substr(2,8).toUpperCase();
-  const order={{
+  const order={
     orderId,
-    customer:{{firstName:fname,lastName:lname,email,phone,address,city,state,zip}},
-    items:cart.map(i=>{{const p=PRODUCTS.find(x=>x.id===i.id);return{{name:i.name,size:i.size,qty:i.qty,price:i.price,cat:i.cat,img:i.img}}}}),
+    customer:{firstName:fname,lastName:lname,email,phone,address,city,state,zip},
+    items:cart.map(i=>{const p=PRODUCTS.find(x=>x.id===i.id);return{name:i.name,size:i.size,qty:i.qty,price:i.price,cat:i.cat,img:i.img}}),
     subtotal:sub,deliveryFee,discount,total,
     paymentMethod,deliveryMode,
     status:'pending',
     createdAt:new Date().toISOString(),
     notes:''
-  }};
+  };
   // Save to Firebase or localStorage
-  try{{
-    if(fbReady&&window._fb){{
-      const {{db,collection,addDoc,serverTimestamp}}=window._fb;
-      await addDoc(collection(db,'orders'),{{...order,serverTime:serverTimestamp()}});
+  try{
+    if(fbReady&&window._fb){
+      const {db,collection,addDoc,serverTimestamp}=window._fb;
+      await addDoc(collection(db,'orders'),{...order,serverTime:serverTimestamp()});
       toast('Order saved to Firebase ✓','success');
-    }}
-  }}catch(e){{
+    }
+  }catch(e){
     // fallback to localStorage
-  }}
+  }
   const orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
   orders.unshift(order);
   localStorage.setItem('aktivity_orders',JSON.stringify(orders));
@@ -2955,123 +2955,123 @@ async function placeOrder(){{
   cart=[];saveCart();updateCartUI();discount=0;
   // Show confirm
   document.getElementById('confirm-order-id').textContent=orderId;
-  document.getElementById('confirm-msg').textContent=`Thank you ${{fname}}! Your order ${{orderId}} is being processed.`;
+  document.getElementById('confirm-msg').textContent=`Thank you ${fname}! Your order ${orderId} is being processed.`;
   document.getElementById('confirm-modal').classList.add('open');
-}}
+}
 
 // ─── NOTIFICATIONS ─────────────────────────────────────────────
-function scheduleNotification(orderId,email,name){{
+function scheduleNotification(orderId,email,name){
   // Web push notification (if permission granted)
-  if(Notification&&Notification.permission==='granted'){{
-    new Notification('AKTIVITY — Order Received!',{{
-      body:`Hey ${{name}}! Order ${{orderId}} is being processed.`,
+  if(Notification&&Notification.permission==='granted'){
+    new Notification('AKTIVITY — Order Received!',{
+      body:`Hey ${name}! Order ${orderId} is being processed.`,
       icon:''
-    }});
-  }}else if(Notification&&Notification.permission!=='denied'){{
-    Notification.requestPermission().then(p=>{{
-      if(p==='granted')new Notification('AKTIVITY — Order Received!',{{body:`Order ${{orderId}} confirmed!`}});
-    }});
-  }}
-  toast(`Order confirmation sent to ${{email}} 📧`,'info');
-}}
+    });
+  }else if(Notification&&Notification.permission!=='denied'){
+    Notification.requestPermission().then(p=>{
+      if(p==='granted')new Notification('AKTIVITY — Order Received!',{body:`Order ${orderId} confirmed!`});
+    });
+  }
+  toast(`Order confirmation sent to ${email} 📧`,'info');
+}
 
 // ─── TRACK ORDER ───────────────────────────────────────────────
-async function trackOrder(){{
+async function trackOrder(){
   const id=document.getElementById('track-input').value.trim().toUpperCase();
-  if(!id){{toast('Enter an Order ID','error');return;}}
+  if(!id){toast('Enter an Order ID','error');return;}
   let order=null;
   // Check Firebase
-  try{{
-    if(fbReady&&window._fb){{
-      const {{db,collection,getDocs,query,where}}=window._fb;
+  try{
+    if(fbReady&&window._fb){
+      const {db,collection,getDocs,query,where}=window._fb;
       const q=query(collection(db,'orders'),where('orderId','==',id));
       const snap=await getDocs(q);
-      if(!snap.empty)order={{...snap.docs[0].data(),docId:snap.docs[0].id}};
-    }}
-  }}catch(e){{}}
+      if(!snap.empty)order={...snap.docs[0].data(),docId:snap.docs[0].id};
+    }
+  }catch(e){}
   // fallback localStorage
-  if(!order){{
+  if(!order){
     const orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
     order=orders.find(o=>o.orderId===id)||null;
-  }}
-  if(!order){{
+  }
+  if(!order){
     document.getElementById('track-result').style.display='none';
     document.getElementById('track-none').style.display='block';
     return;
-  }}
+  }
   document.getElementById('track-none').style.display='none';
   document.getElementById('track-result').style.display='block';
   document.getElementById('tr-id').textContent=order.orderId;
-  document.getElementById('tr-status-wrap').innerHTML=`<span class="status status-${{order.status}}">${{order.status.toUpperCase()}}</span>`;
+  document.getElementById('tr-status-wrap').innerHTML=`<span class="status status-${order.status}">${order.status.toUpperCase()}</span>`;
   const c=order.customer;
   document.getElementById('tr-customer').innerHTML=`
-    <div class="customer-field"><span>Name</span>${{c.firstName}} ${{c.lastName}}</div>
-    <div class="customer-field"><span>Email</span>${{c.email}}</div>
-    <div class="customer-field"><span>Phone</span>${{c.phone}}</div>
-    <div class="customer-field"><span>Address</span>${{c.address}}, ${{c.city}}, ${{c.state}} ${{c.zip}}</div>
-    <div class="customer-field"><span>Total</span>$${{order.total?.toFixed(2)||'N/A'}}</div>
-    <div class="customer-field"><span>Payment</span>${{order.paymentMethod?.toUpperCase()||'N/A'}}</div>
+    <div class="customer-field"><span>Name</span>${c.firstName} ${c.lastName}</div>
+    <div class="customer-field"><span>Email</span>${c.email}</div>
+    <div class="customer-field"><span>Phone</span>${c.phone}</div>
+    <div class="customer-field"><span>Address</span>${c.address}, ${c.city}, ${c.state} ${c.zip}</div>
+    <div class="customer-field"><span>Total</span>$${order.total?.toFixed(2)||'N/A'}</div>
+    <div class="customer-field"><span>Payment</span>${order.paymentMethod?.toUpperCase()||'N/A'}</div>
   `;
   const statusOrder=['pending','confirmed','shipped','delivered'];
   const si=statusOrder.indexOf(order.status);
   const steps=[
-    {{icon:'📋',title:'Order Placed',desc:'We received your order and it is being reviewed.',done:si>=0}},
-    {{icon:'✅',title:'Order Confirmed',desc:'Payment verified and order confirmed.',done:si>=1}},
-    {{icon:'📦',title:'Shipped',desc:'Your order is on its way!',done:si>=2}},
-    {{icon:'🎉',title:'Delivered',desc:'Package delivered. Enjoy your AKTIVITY pieces!',done:si>=3}},
+    {icon:'📋',title:'Order Placed',desc:'We received your order and it is being reviewed.',done:si>=0},
+    {icon:'✅',title:'Order Confirmed',desc:'Payment verified and order confirmed.',done:si>=1},
+    {icon:'📦',title:'Shipped',desc:'Your order is on its way!',done:si>=2},
+    {icon:'🎉',title:'Delivered',desc:'Package delivered. Enjoy your AKTIVITY pieces!',done:si>=3},
   ];
   document.getElementById('track-timeline').innerHTML=steps.map(s=>`
-    <div class="track-step ${{s.done?'done':''}}">
-      <div class="track-dot">${{s.done?'✓':s.icon}}</div>
+    <div class="track-step ${s.done?'done':''}">
+      <div class="track-dot">${s.done?'✓':s.icon}</div>
       <div class="track-step-body">
-        <div class="track-step-title">${{s.title}}</div>
-        <div class="track-step-desc">${{s.desc}}</div>
+        <div class="track-step-title">${s.title}</div>
+        <div class="track-step-desc">${s.desc}</div>
       </div>
     </div>`).join('');
-}}
+}
 
 // ─── ADMIN ─────────────────────────────────────────────────────
-function checkAdminAuth(){{
+function checkAdminAuth(){
   const user=adminUser;
   const stored=localStorage.getItem('aktivity_admin');
   if(user||stored==='true')showAdminPanel();
-  else{{document.getElementById('admin-login').style.display='flex';document.getElementById('admin-panel').style.display='none';}}
-}}
+  else{document.getElementById('admin-login').style.display='flex';document.getElementById('admin-panel').style.display='none';}
+}
 
-async function adminLogin(){{
+async function adminLogin(){
   const email=document.getElementById('admin-email').value.trim();
   const pass=document.getElementById('admin-pass').value;
   // Demo login
-  if(email==='admin@aktivity.com'&&pass==='aktivity2024'){{
+  if(email==='admin@aktivity.com'&&pass==='aktivity2024'){
     localStorage.setItem('aktivity_admin','true');
     showAdminPanel();toast('Welcome back, Admin 👑','success');return;
-  }}
-  if(fbReady&&window._fb){{
-    try{{
-      const {{auth,signInWithEmailAndPassword}}=window._fb;
+  }
+  if(fbReady&&window._fb){
+    try{
+      const {auth,signInWithEmailAndPassword}=window._fb;
       await signInWithEmailAndPassword(auth,email,pass);
       localStorage.setItem('aktivity_admin','true');
       showAdminPanel();toast('Welcome back, Admin 👑','success');
-    }}catch(e){{toast('Login failed: '+e.message,'error');}}
-  }}else{{toast('Invalid credentials','error');}}
-}}
+    }catch(e){toast('Login failed: '+e.message,'error');}
+  }else{toast('Invalid credentials','error');}
+}
 
-function showAdminPanel(){{
+function showAdminPanel(){
   document.getElementById('admin-login').style.display='none';
   document.getElementById('admin-panel').style.display='block';
   loadAdminOrders();loadAdminStats();
-}}
+}
 
-function adminLogout(){{
+function adminLogout(){
   localStorage.removeItem('aktivity_admin');
   adminUser=null;
-  if(fbReady&&window._fb)window._fb.signOut(window._fb.auth).catch(()=>{{}});
+  if(fbReady&&window._fb)window._fb.signOut(window._fb.auth).catch(()=>{});
   document.getElementById('admin-login').style.display='flex';
   document.getElementById('admin-panel').style.display='none';
   toast('Logged out','info');
-}}
+}
 
-function adminTab(tab,el){{
+function adminTab(tab,el){
   document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   document.querySelectorAll('.admin-nav-item').forEach(i=>i.classList.remove('active'));
@@ -3079,29 +3079,29 @@ function adminTab(tab,el){{
   if(tab==='orders')loadAdminOrders();
   if(tab==='customers')loadCustomers();
   if(tab==='products')loadAdminProducts();
-}}
+}
 
-async function loadAdminOrders(){{
+async function loadAdminOrders(){
   let orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
-  try{{
-    if(fbReady&&window._fb){{
-      const {{db,collection,getDocs,query,orderBy}}=window._fb;
+  try{
+    if(fbReady&&window._fb){
+      const {db,collection,getDocs,query,orderBy}=window._fb;
       const snap=await getDocs(query(collection(db,'orders'),orderBy('createdAt','desc')));
-      if(!snap.empty)orders=snap.docs.map(d=>{{return{{...d.data(),docId:d.id}};}});
-    }}
-  }}catch(e){{}}
+      if(!snap.empty)orders=snap.docs.map(d=>{return{...d.data(),docId:d.id};});
+    }
+  }catch(e){}
   allOrders=orders;
   renderOrdersTable(orders);
   loadAdminStats(orders);
-}}
+}
 
-function filterOrders(){{
+function filterOrders(){
   const f=document.getElementById('order-filter').value;
   const filtered=f==='all'?allOrders:allOrders.filter(o=>o.status===f);
   renderOrdersTable(filtered);
-}}
+}
 
-function loadAdminStats(orders){{
+function loadAdminStats(orders){
   const o=orders||allOrders;
   document.getElementById('stat-orders').textContent=o.length;
   document.getElementById('stat-revenue').textContent='$'+(o.reduce((s,x)=>s+(x.total||0),0)).toFixed(0);
@@ -3112,130 +3112,130 @@ function loadAdminStats(orders){{
   document.getElementById('recent-orders-table').innerHTML=recent.length?`
     <div style="overflow-x:auto;"><table class="data-table">
       <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-      <tbody>${{recent.map(renderOrderRow).join('')}}</tbody>
+      <tbody>${recent.map(renderOrderRow).join('')}</tbody>
     </table></div>`:'<p style="color:var(--fg-muted);">No orders yet.</p>';
-}}
+}
 
-function renderOrdersTable(orders){{
+function renderOrdersTable(orders){
   const el=document.getElementById('orders-list');
-  if(!orders.length){{el.innerHTML='<p style="color:var(--fg-muted);text-align:center;padding:3rem 0;">No orders found.</p>';return;}}
-  el.innerHTML=orders.map(order=>{{
-    const c=order.customer||{{}};
+  if(!orders.length){el.innerHTML='<p style="color:var(--fg-muted);text-align:center;padding:3rem 0;">No orders found.</p>';return;}
+  el.innerHTML=orders.map(order=>{
+    const c=order.customer||{};
     return `<div class="order-card">
       <div class="order-card-head">
         <div>
-          <div class="order-id">${{order.orderId}}</div>
-          <div class="order-meta">${{new Date(order.createdAt).toLocaleDateString()}} · ${{order.paymentMethod?.toUpperCase()||'N/A'}}</div>
+          <div class="order-id">${order.orderId}</div>
+          <div class="order-meta">${new Date(order.createdAt).toLocaleDateString()} · ${order.paymentMethod?.toUpperCase()||'N/A'}</div>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;">
-          <span class="status status-${{order.status}}">${{order.status?.toUpperCase()}}</span>
-          <div class="price">$${{order.total?.toFixed(2)||'0.00'}}</div>
+          <span class="status status-${order.status}">${order.status?.toUpperCase()}</span>
+          <div class="price">$${order.total?.toFixed(2)||'0.00'}</div>
         </div>
       </div>
       <div class="customer-info">
-        <div class="customer-field"><span>Name</span>${{c.firstName||''}} ${{c.lastName||''}}</div>
-        <div class="customer-field"><span>Email</span>${{c.email||'N/A'}}</div>
-        <div class="customer-field"><span>Phone</span>${{c.phone||'N/A'}}</div>
-        <div class="customer-field"><span>Address</span>${{c.address||''}}, ${{c.city||''}}, ${{c.state||''}} ${{c.zip||''}}</div>
-        <div class="customer-field"><span>Items</span>${{order.items?.length||0}} item(s)</div>
-        <div class="customer-field"><span>Delivery</span>${{order.deliveryMode||'standard'}} · $${{order.deliveryFee?.toFixed(2)||'0.00'}}</div>
+        <div class="customer-field"><span>Name</span>${c.firstName||''} ${c.lastName||''}</div>
+        <div class="customer-field"><span>Email</span>${c.email||'N/A'}</div>
+        <div class="customer-field"><span>Phone</span>${c.phone||'N/A'}</div>
+        <div class="customer-field"><span>Address</span>${c.address||''}, ${c.city||''}, ${c.state||''} ${c.zip||''}</div>
+        <div class="customer-field"><span>Items</span>${order.items?.length||0} item(s)</div>
+        <div class="customer-field"><span>Delivery</span>${order.deliveryMode||'standard'} · $${order.deliveryFee?.toFixed(2)||'0.00'}</div>
       </div>
       <div style="margin-bottom:1rem;max-height:160px;overflow-y:auto;">
-        ${{(order.items||[]).map(i=>`<div style="display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;"><img src="${{IMG[i.img]||''}}" style="width:36px;height:36px;object-fit:contain;background:var(--card2);border-radius:6px;"/><span style="flex:1;">${{i.name}} ${{i.size?'('+i.size+')':''}}</span><span>×${{i.qty}}</span><span style="color:var(--acid);">$${{(i.price*i.qty).toFixed(2)}}</span></div>`).join('')}}
+        ${(order.items||[]).map(i=>`<div style="display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;"><img src="${IMG[i.img]||''}" style="width:36px;height:36px;object-fit:contain;background:var(--card2);border-radius:6px;"/><span style="flex:1;">${i.name} ${i.size?'('+i.size+')':''}</span><span>×${i.qty}</span><span style="color:var(--acid);">$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}
       </div>
       <div class="order-actions">
-        <button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${{order.orderId}}','confirmed')">✅ Confirm</button>
-        <button class="btn btn-secondary btn-sm" onclick="updateOrderStatus('${{order.orderId}}','shipped')">📦 Shipped</button>
-        <button class="btn btn-ghost btn-sm" onclick="updateOrderStatus('${{order.orderId}}','delivered')">🎉 Delivered</button>
-        <button class="btn btn-ghost btn-sm" onclick="showInvoice('${{order.orderId}}')">🧾 Invoice</button>
-        <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="updateOrderStatus('${{order.orderId}}','cancelled')">✕ Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.orderId}','confirmed')">✅ Confirm</button>
+        <button class="btn btn-secondary btn-sm" onclick="updateOrderStatus('${order.orderId}','shipped')">📦 Shipped</button>
+        <button class="btn btn-ghost btn-sm" onclick="updateOrderStatus('${order.orderId}','delivered')">🎉 Delivered</button>
+        <button class="btn btn-ghost btn-sm" onclick="showInvoice('${order.orderId}')">🧾 Invoice</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="updateOrderStatus('${order.orderId}','cancelled')">✕ Cancel</button>
       </div>
     </div>`;
-  }}).join('');
-}}
+  }).join('');
+}
 
-function renderOrderRow(order){{
-  const c=order.customer||{{}};
+function renderOrderRow(order){
+  const c=order.customer||{};
   return `<tr>
-    <td style="font-family:var(--font-display);font-size:1rem;color:var(--acid);">${{order.orderId}}</td>
-    <td>${{c.firstName||''}} ${{c.lastName||''}}</td>
-    <td style="color:var(--acid);">$${{order.total?.toFixed(2)||'0.00'}}</td>
-    <td><span class="status status-${{order.status}}">${{order.status?.toUpperCase()}}</span></td>
-    <td style="color:var(--fg-muted);">${{new Date(order.createdAt).toLocaleDateString()}}</td>
+    <td style="font-family:var(--font-display);font-size:1rem;color:var(--acid);">${order.orderId}</td>
+    <td>${c.firstName||''} ${c.lastName||''}</td>
+    <td style="color:var(--acid);">$${order.total?.toFixed(2)||'0.00'}</td>
+    <td><span class="status status-${order.status}">${order.status?.toUpperCase()}</span></td>
+    <td style="color:var(--fg-muted);">${new Date(order.createdAt).toLocaleDateString()}</td>
     <td><button class="btn btn-primary btn-sm" onclick="adminTab('orders',null)">Manage</button></td>
   </tr>`;
-}}
+}
 
-async function updateOrderStatus(orderId,status){{
+async function updateOrderStatus(orderId,status){
   // Update localStorage
   const orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
   const i=orders.findIndex(o=>o.orderId===orderId);
-  if(i>=0){{orders[i].status=status;localStorage.setItem('aktivity_orders',JSON.stringify(orders));}}
+  if(i>=0){orders[i].status=status;localStorage.setItem('aktivity_orders',JSON.stringify(orders));}
   // Update Firebase
-  try{{
-    if(fbReady&&window._fb){{
-      const {{db,collection,getDocs,query,where,doc,updateDoc}}=window._fb;
+  try{
+    if(fbReady&&window._fb){
+      const {db,collection,getDocs,query,where,doc,updateDoc}=window._fb;
       const q=query(collection(db,'orders'),where('orderId','==',orderId));
       const snap=await getDocs(q);
-      if(!snap.empty)await updateDoc(doc(db,'orders',snap.docs[0].id),{{status}});
-    }}
-  }}catch(e){{}}
-  allOrders=allOrders.map(o=>o.orderId===orderId?{{...o,status}}:o);
+      if(!snap.empty)await updateDoc(doc(db,'orders',snap.docs[0].id),{status});
+    }
+  }catch(e){}
+  allOrders=allOrders.map(o=>o.orderId===orderId?{...o,status}:o);
   const order=allOrders.find(o=>o.orderId===orderId);
   // Notify customer
-  if(order){{
-    const msgs={{
-      confirmed:`Your order ${{orderId}} has been CONFIRMED! We're preparing it now. 🎉`,
-      shipped:`Great news! Order ${{orderId}} has been shipped and is on its way! 📦`,
-      delivered:`Order ${{orderId}} has been delivered. Enjoy your AKTIVITY pieces! 🔥`,
-      cancelled:`Order ${{orderId}} has been cancelled. Contact support for help.`
-    }};
+  if(order){
+    const msgs={
+      confirmed:`Your order ${orderId} has been CONFIRMED! We're preparing it now. 🎉`,
+      shipped:`Great news! Order ${orderId} has been shipped and is on its way! 📦`,
+      delivered:`Order ${orderId} has been delivered. Enjoy your AKTIVITY pieces! 🔥`,
+      cancelled:`Order ${orderId} has been cancelled. Contact support for help.`
+    };
     // Web notification
-    if(Notification&&Notification.permission==='granted'){{
-      new Notification(`AKTIVITY — Order ${{status.toUpperCase()}}`,{{body:msgs[status]}});
-    }}
-    toast(`Order ${{orderId}} → ${{status.toUpperCase()}} ✓`,'success');
-  }}
+    if(Notification&&Notification.permission==='granted'){
+      new Notification(`AKTIVITY — Order ${status.toUpperCase()}`,{body:msgs[status]});
+    }
+    toast(`Order ${orderId} → ${status.toUpperCase()} ✓`,'success');
+  }
   loadAdminOrders();
-}}
+}
 
-function loadAdminProducts(){{
+function loadAdminProducts(){
   document.getElementById('admin-products-list').innerHTML=`
     <div style="overflow-x:auto;"><table class="data-table">
       <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Rating</th><th>Status</th></tr></thead>
-      <tbody>${{PRODUCTS.map(p=>`<tr>
-        <td><img src="${{IMG[p.img]}}" style="width:48px;height:48px;object-fit:contain;background:var(--card2);border-radius:8px;"/></td>
-        <td style="font-family:var(--font-cond);font-weight:700;">${{p.name}}</td>
-        <td><span class="badge badge-acid">${{p.cat.toUpperCase()}}</span></td>
-        <td style="color:var(--acid);">$${{p.price}}</td>
-        <td>${{p.rating}}★</td>
-        <td>${{p.isNew?'<span class="badge badge-sky">NEW</span>':''}}${{p.isSale?'<span class="badge badge-rust">SALE</span>':''}}</td>
-      </tr>`).join('')}}</tbody>
+      <tbody>${PRODUCTS.map(p=>`<tr>
+        <td><img src="${IMG[p.img]}" style="width:48px;height:48px;object-fit:contain;background:var(--card2);border-radius:8px;"/></td>
+        <td style="font-family:var(--font-cond);font-weight:700;">${p.name}</td>
+        <td><span class="badge badge-acid">${p.cat.toUpperCase()}</span></td>
+        <td style="color:var(--acid);">$${p.price}</td>
+        <td>${p.rating}★</td>
+        <td>${p.isNew?'<span class="badge badge-sky">NEW</span>':''}${p.isSale?'<span class="badge badge-rust">SALE</span>':''}</td>
+      </tr>`).join('')}</tbody>
     </table></div>`;
-}}
+}
 
-function loadCustomers(){{
+function loadCustomers(){
   const orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
-  const uniq={{}}; orders.forEach(o=>{{if(o.customer?.email)uniq[o.customer.email]=o.customer;}});
+  const uniq={}; orders.forEach(o=>{if(o.customer?.email)uniq[o.customer.email]=o.customer;});
   const customers=Object.values(uniq);
   document.getElementById('customers-list').innerHTML=customers.length?`
     <div style="overflow-x:auto;"><table class="data-table">
       <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>State</th></tr></thead>
-      <tbody>${{customers.map(c=>`<tr>
-        <td style="font-family:var(--font-cond);font-weight:700;">${{c.firstName}} ${{c.lastName}}</td>
-        <td>${{c.email}}</td><td>${{c.phone}}</td><td>${{c.city}}</td><td>${{c.state}}</td>
-      </tr>`).join('')}}</tbody>
+      <tbody>${customers.map(c=>`<tr>
+        <td style="font-family:var(--font-cond);font-weight:700;">${c.firstName} ${c.lastName}</td>
+        <td>${c.email}</td><td>${c.phone}</td><td>${c.city}</td><td>${c.state}</td>
+      </tr>`).join('')}</tbody>
     </table></div>`:'<p style="color:var(--fg-muted);text-align:center;padding:3rem 0;">No customers yet.</p>';
-}}
+}
 
 // ─── INVOICE ───────────────────────────────────────────────────
-function showInvoice(orderId){{
+function showInvoice(orderId){
   const orders=JSON.parse(localStorage.getItem('aktivity_orders')||'[]');
   const all=allOrders.length?allOrders:orders;
   const order=all.find(o=>o.orderId===orderId);
   if(!order)return;
-  const c=order.customer||{{}};
-  const now=new Date(order.createdAt).toLocaleDateString('en-US',{{year:'numeric',month:'long',day:'numeric'}});
+  const c=order.customer||{};
+  const now=new Date(order.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   document.getElementById('invoice-content').innerHTML=`
   <div class="invoice" id="printable-invoice">
     <div class="invoice-header">
@@ -3245,33 +3245,33 @@ function showInvoice(orderId){{
       </div>
       <div style="text-align:right;">
         <div style="font-size:1.5rem;font-weight:900;color:#1a1a1a;">INVOICE</div>
-        <div style="font-size:0.85rem;color:#666;margin-top:0.3rem;">Invoice #: ${{order.orderId}}<br>Date: ${{now}}</div>
+        <div style="font-size:0.85rem;color:#666;margin-top:0.3rem;">Invoice #: ${order.orderId}<br>Date: ${now}</div>
       </div>
     </div>
     <hr style="border:none;border-top:2px solid #1a1a1a;margin:1rem 0;"/>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
       <div>
         <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#999;margin-bottom:0.4rem;">Bill To</div>
-        <div style="font-weight:700;">${{c.firstName}} ${{c.lastName}}</div>
-        <div style="font-size:0.85rem;color:#666;">${{c.email}}<br>${{c.phone}}<br>${{c.address}}, ${{c.city}}, ${{c.state}} ${{c.zip}}</div>
+        <div style="font-weight:700;">${c.firstName} ${c.lastName}</div>
+        <div style="font-size:0.85rem;color:#666;">${c.email}<br>${c.phone}<br>${c.address}, ${c.city}, ${c.state} ${c.zip}</div>
       </div>
       <div>
         <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#999;margin-bottom:0.4rem;">Payment</div>
-        <div style="font-size:0.85rem;color:#666;">${{order.paymentMethod?.toUpperCase()}}<br>Status: <span style="color:#00c896;font-weight:700;">PAID</span><br>Delivery: ${{order.deliveryMode}}</div>
+        <div style="font-size:0.85rem;color:#666;">${order.paymentMethod?.toUpperCase()}<br>Status: <span style="color:#00c896;font-weight:700;">PAID</span><br>Delivery: ${order.deliveryMode}</div>
       </div>
     </div>
     <table class="invoice-table">
       <thead><tr><th>Item</th><th>Category</th><th>Size</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
       <tbody>
-        ${{(order.items||[]).map(i=>`<tr><td>${{i.name}}</td><td>${{i.cat?.toUpperCase()}}</td><td>${{i.size||'—'}}</td><td>${{i.qty}}</td><td>$${{i.price.toFixed(2)}}</td><td>$${{(i.price*i.qty).toFixed(2)}}</td></tr>`).join('')}}
+        ${(order.items||[]).map(i=>`<tr><td>${i.name}</td><td>${i.cat?.toUpperCase()}</td><td>${i.size||'—'}</td><td>${i.qty}</td><td>$${i.price.toFixed(2)}</td><td>$${(i.price*i.qty).toFixed(2)}</td></tr>`).join('')}
       </tbody>
     </table>
     <div class="invoice-totals">
       <table style="margin-left:auto;min-width:220px;border-collapse:collapse;">
-        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Subtotal</td><td style="padding:0.3rem 0.5rem;text-align:right;">$${{order.subtotal?.toFixed(2)||'0.00'}}</td></tr>
-        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Delivery</td><td style="padding:0.3rem 0.5rem;text-align:right;">$${{order.deliveryFee?.toFixed(2)||'0.00'}}</td></tr>
-        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Discount</td><td style="padding:0.3rem 0.5rem;text-align:right;color:#d4630a;">-$${{order.discount?.toFixed(2)||'0.00'}}</td></tr>
-        <tr style="border-top:2px solid #1a1a1a;"><td style="padding:0.5rem;font-weight:900;" class="grand">TOTAL</td><td style="padding:0.5rem;font-weight:900;font-size:1.2rem;text-align:right;" class="grand">$${{order.total?.toFixed(2)||'0.00'}}</td></tr>
+        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Subtotal</td><td style="padding:0.3rem 0.5rem;text-align:right;">$${order.subtotal?.toFixed(2)||'0.00'}</td></tr>
+        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Delivery</td><td style="padding:0.3rem 0.5rem;text-align:right;">$${order.deliveryFee?.toFixed(2)||'0.00'}</td></tr>
+        <tr><td style="padding:0.3rem 0.5rem;color:#666;font-size:0.85rem;">Discount</td><td style="padding:0.3rem 0.5rem;text-align:right;color:#d4630a;">-$${order.discount?.toFixed(2)||'0.00'}</td></tr>
+        <tr style="border-top:2px solid #1a1a1a;"><td style="padding:0.5rem;font-weight:900;" class="grand">TOTAL</td><td style="padding:0.5rem;font-weight:900;font-size:1.2rem;text-align:right;" class="grand">$${order.total?.toFixed(2)||'0.00'}</td></tr>
       </table>
     </div>
     <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;font-size:0.78rem;color:#999;text-align:center;">
@@ -3279,55 +3279,55 @@ function showInvoice(orderId){{
     </div>
   </div>`;
   document.getElementById('invoice-modal').classList.add('open');
-}}
+}
 
-function printInvoice(){{
+function printInvoice(){
   const content=document.getElementById('printable-invoice').innerHTML;
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>Invoice - AKTIVITY</title><style>body{{font-family:sans-serif;margin:2rem;}}table{{width:100%;border-collapse:collapse;}}th,td{{padding:0.5rem;text-align:left;border-bottom:1px solid #eee;}}.invoice-brand{{font-size:2rem;font-weight:900;color:#1a1a1a;}}.invoice-brand span{{color:#d4f000;}}.grand{{font-size:1.2rem;font-weight:900;}}</style></head><body>${{content}}</body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><title>Invoice - AKTIVITY</title><style>body{font-family:sans-serif;margin:2rem;}table{width:100%;border-collapse:collapse;}th,td{padding:0.5rem;text-align:left;border-bottom:1px solid #eee;}.invoice-brand{font-size:2rem;font-weight:900;color:#1a1a1a;}.invoice-brand span{color:#d4f000;}.grand{font-size:1.2rem;font-weight:900;}</style></head><body>${content}</body></html>`);
   w.document.close();w.print();
-}}
+}
 
 // ─── ADMIN NOTIFICATIONS ───────────────────────────────────────
-function sendNotification(status){{
+function sendNotification(status){
   const oid=document.getElementById('notif-order-id').value.trim().toUpperCase();
   const msg=document.getElementById('notif-msg').value.trim();
-  if(!oid){{toast('Enter Order ID','error');return;}}
+  if(!oid){toast('Enter Order ID','error');return;}
   updateOrderStatus(oid,status);
   const log=document.getElementById('notification-log');
   const entry=document.createElement('div');
   entry.style.cssText='background:var(--card2);border-radius:var(--r);padding:1rem;margin-top:0.75rem;border-left:3px solid var(--acid);';
-  entry.innerHTML=`<div style="display:flex;justify-content:space-between;"><strong style="font-family:var(--font-cond);">${{oid}}</strong><span style="font-size:0.78rem;color:var(--fg-muted);">${{new Date().toLocaleTimeString()}}</span></div><div style="font-size:0.85rem;color:var(--fg-muted);margin-top:0.3rem;">Status → <span class="status status-${{status}}">${{status.toUpperCase()}}</span></div>${{msg?`<div style="font-size:0.82rem;margin-top:0.3rem;">${{msg}}</div>`:''}}`;
+  entry.innerHTML=`<div style="display:flex;justify-content:space-between;"><strong style="font-family:var(--font-cond);">${oid}</strong><span style="font-size:0.78rem;color:var(--fg-muted);">${new Date().toLocaleTimeString()}</span></div><div style="font-size:0.85rem;color:var(--fg-muted);margin-top:0.3rem;">Status → <span class="status status-${status}">${status.toUpperCase()}</span></div>${msg?`<div style="font-size:0.82rem;margin-top:0.3rem;">${msg}</div>`:''}`;
   log.appendChild(entry);
-  toast(`Notification sent for ${{oid}}`,'success');
-}}
+  toast(`Notification sent for ${oid}`,'success');
+}
 
 // ─── NEWSLETTER ────────────────────────────────────────────────
-function subscribeNewsletter(){{
+function subscribeNewsletter(){
   const email=document.getElementById('nl-email').value.trim();
-  if(!email||!/\\S+@\\S+\\.\\S+/.test(email)){{toast('Enter a valid email','error');return;}}
-  toast(`Welcome to the crew! Check ${{email}} 🤙`,'success');
+  if(!email||!/\\S+@\\S+\\.\\S+/.test(email)){toast('Enter a valid email','error');return;}
+  toast(`Welcome to the crew! Check ${email} 🤙`,'success');
   document.getElementById('nl-email').value='';
-}}
+}
 
 // ─── NAVBAR SCROLL ─────────────────────────────────────────────
-window.addEventListener('scroll',()=>{{
+window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
   document.getElementById('back-top').classList.toggle('show',window.scrollY>400);
-}});
+});
 
 // ─── TOAST ─────────────────────────────────────────────────────
-function toast(msg,type='info'){{
-  const icons={{success:'✓',error:'✕',info:'ℹ'}};
+function toast(msg,type='info'){
+  const icons={success:'✓',error:'✕',info:'ℹ'};
   const t=document.createElement('div');
-  t.className=`toast ${{type}}`;
-  t.innerHTML=`<span style="font-size:1rem;">${{icons[type]||'ℹ'}}</span>${{msg}}`;
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span style="font-size:1rem;">${icons[type]||'ℹ'}</span>${msg}`;
   document.getElementById('toast-container').appendChild(t);
-  setTimeout(()=>{{t.style.animation='slideOutToast 0.3s ease forwards';setTimeout(()=>t.remove(),300);}},3500);
-}}
+  setTimeout(()=>{t.style.animation='slideOutToast 0.3s ease forwards';setTimeout(()=>t.remove(),300);},3500);
+}
 
 // ─── SCROLL BACK TOP ───────────────────────────────────────────
-document.getElementById('back-top').addEventListener('click',()=>window.scrollTo({{top:0,behavior:'smooth'}}));
+document.getElementById('back-top').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
 </script>
 </body>
