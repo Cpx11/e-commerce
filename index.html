@@ -1463,33 +1463,7 @@ body.light-mode {
 </div>
 
 
-<!--CART HTML-->
-<div id="cursor"></div><div id="cursor-ring"></div>
-<div id="loading-screen"><div class="loading-logo">AKTIVITY</div><div class="loading-bar-track"><div class="loading-bar"></div></div></div>
 
-<nav class="navbar" id="navbar">
-  <a href="../index.html" class="nav-logo">AKTIVITY</a>
-  <ul class="nav-links">
-    <li><a href="../index.html#catalog">Shop</a></li>
-    <li><a href="profile.html">Account</a></li>
-    <li><a href="orders.html">Orders</a></li>
-  </ul>
-  <div class="nav-actions">
-    <a href="cart.html" class="cart-icon-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      <span class="cart-badge">0</span>
-    </a>
-  </div>
-</nav>
-
-<canvas id="confetti-canvas"></canvas>
-
-<div class="cart-page">
-  <div class="container">
-    <h2 style="margin-bottom:2rem" class="reveal">Your Cart</h2>
-    <div id="cart-content"></div>
-  </div>
-</div>
 
 <!--CHECKOUT-->
 <div id="cursor"></div><div id="cursor-ring"></div>
@@ -1626,17 +1600,17 @@ body.light-mode {
   </div>
 </div>
 
-<script type="module">
+
+    
+  <script type="module">
 // ============================================
-// AKTIVITY WITH FIREBASE BACKEND - WORKING
+// AKTIVITY - WORKING VERSION
 // ============================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// YOUR FIREBASE CONFIG (keep as is)
 const firebaseConfig = {
   apiKey: "AIzaSyA61SXnSJpWeULnFjw1plQq6xY88dy318A",
   authDomain: "e-commerce-9dd43.firebaseapp.com",
@@ -1649,9 +1623,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-// ---------- CART (localStorage) ----------
+// ---------- CART ----------
 function getCart() {
   try { return JSON.parse(localStorage.getItem("aktivity_cart") || "[]"); }
   catch { return []; }
@@ -1698,7 +1671,6 @@ function showToast(msg, type = "success") {
   }, 3000);
 }
 
-// ---------- AI SIZE ----------
 function recommendSize({ height, weight, usualSize, fit }) {
   const h = parseFloat(height);
   const w = parseFloat(weight);
@@ -1714,12 +1686,10 @@ function recommendSize({ height, weight, usualSize, fit }) {
   let idx = sizes.indexOf(base);
   if (fit === "loose") idx = Math.min(idx + 1, sizes.length - 1);
   if (fit === "slim") idx = Math.max(idx - 1, 0);
-  const usualIdx = sizes.indexOf(usualSize.toUpperCase());
-  if (usualIdx !== -1) idx = Math.round((idx + usualIdx) / 2);
-  return { size: sizes[idx], message: `We recommend ${sizes[idx]} for your measurements.` };
+  return { size: sizes[idx], message: `We recommend ${sizes[idx]} for you.` };
 }
 
-// ---------- PRODUCT DATA (Firebase first, then fallback) ----------
+// ---------- PRODUCT DATA ----------
 let allProducts = [];
 let activeCategory = "all";
 let activeSortVal = "default";
@@ -1732,7 +1702,7 @@ const DEMO_PRODUCTS = [
   { id: "p5", name: "SYSTEM FULL SET", category: "outfits", price: 65000, sizes: ["S","M","L","XL"], stock: 4, images: ["https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80"], description: "Matched two-piece.", featured: false },
   { id: "p6", name: "CORE TEE BLACK", category: "shirts", price: 6500, sizes: ["XS","S","M","L","XL","XXL"], stock: 25, images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"], description: "300gsm cotton tee.", featured: false },
   { id: "p7", name: "LAYER CHAIN", category: "necklaces", price: 11000, sizes: ["One Size"], stock: 7, images: ["https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80"], description: "Multi-layer chain set.", featured: false },
-  { id: "p8", name: "LOW RUNNER", category: "kicks", price: 39000, salePrice: 32000, sizes: ["38","39","40","41","42","43"], stock: 0, images: ["https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80"], description: "Low-profile runner.", featured: false },
+  { id: "p8", name: "LOW RUNNER", category: "kicks", price: 39000, sizes: ["38","39","40","41","42","43"], stock: 0, images: ["https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80"], description: "Low-profile runner.", featured: false },
 ];
 
 async function loadProducts() {
@@ -1741,11 +1711,14 @@ async function loadProducts() {
     if (!snap.empty) allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     else allProducts = DEMO_PRODUCTS;
   } catch (error) {
-    console.warn("Firestore error, using demo products:", error);
     allProducts = DEMO_PRODUCTS;
   }
   renderProducts();
   renderFeatured();
+  
+  // HIDE LOADING SCREEN
+  const loader = document.getElementById("loading-screen");
+  if (loader) loader.classList.add("hidden");
 }
 
 function renderProducts() {
@@ -1789,8 +1762,11 @@ function renderFeatured() {
   grid.innerHTML = featured.map(p => `
     <div class="product-card" data-pid="${p.id}">
       <div class="product-card-img"><img src="${p.images?.[0] || ''}"></div>
-      <div class="product-card-body"><div class="product-card-name">${p.name}</div><div class="product-card-price">₦${p.price.toLocaleString()}</div>
-      <button class="btn btn-primary add-cart-btn" data-pid="${p.id}">Add to Cart</button></div>
+      <div class="product-card-body">
+        <div class="product-card-name">${p.name}</div>
+        <div class="product-card-price">₦${p.price.toLocaleString()}</div>
+        <button class="btn btn-primary add-cart-btn" data-pid="${p.id}">Add to Cart</button>
+      </div>
     </div>
   `).join("");
   document.querySelectorAll("#featured-grid .add-cart-btn").forEach(btn => {
@@ -1809,15 +1785,19 @@ onAuthStateChanged(auth, (user) => {
   if (authBtn) authBtn.textContent = user ? "Sign Out" : "Sign In";
 });
 
+function openModal(id) { document.getElementById(id)?.classList.add("open"); }
+function closeModal(id) { document.getElementById(id)?.classList.remove("open"); }
+
 document.getElementById("auth-btn")?.addEventListener("click", () => {
   if (currentUser) signOut(auth).then(() => showToast("Signed out"));
   else openModal("auth-modal");
 });
 
 document.getElementById("auth-submit-btn")?.addEventListener("click", async () => {
-  const email = document.getElementById("auth-email").value;
-  const password = document.getElementById("auth-password").value;
-  const isSignup = document.getElementById("auth-modal-title").textContent === "Create Account";
+  const email = document.getElementById("auth-email")?.value;
+  const password = document.getElementById("auth-password")?.value;
+  const isSignup = document.getElementById("auth-modal-title")?.textContent === "Create Account";
+  if (!email || !password) return showToast("Fill all fields", "error");
   try {
     if (isSignup) await createUserWithEmailAndPassword(auth, email, password);
     else await signInWithEmailAndPassword(auth, email, password);
@@ -1835,75 +1815,80 @@ document.getElementById("auth-google-btn")?.addEventListener("click", async () =
 });
 
 document.getElementById("auth-toggle-btn")?.addEventListener("click", () => {
-  const isSignup = document.getElementById("auth-modal-title").textContent === "Sign In";
-  document.getElementById("auth-modal-title").textContent = isSignup ? "Create Account" : "Sign In";
-  document.getElementById("auth-submit-btn").textContent = isSignup ? "Create Account" : "Sign In";
+  const title = document.getElementById("auth-modal-title");
+  const btn = document.getElementById("auth-submit-btn");
+  const isSignup = title.textContent === "Sign In";
+  title.textContent = isSignup ? "Create Account" : "Sign In";
+  btn.textContent = isSignup ? "Create Account" : "Sign In";
 });
 
-// ---------- MODALS ----------
-function openModal(id) { document.getElementById(id)?.classList.add("open"); }
-function closeModal(id) { document.getElementById(id)?.classList.remove("open"); }
-document.querySelectorAll(".modal-overlay").forEach(overlay => {
-  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
-});
-
-// ---------- INIT ----------
-window.addEventListener("DOMContentLoaded", () => {
-  loadProducts();
-  updateCartBadge();
-  
-  // Filters
-  document.querySelectorAll(".cat-pill").forEach(pill => {
-    pill.addEventListener("click", () => {
-      document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
-      pill.classList.add("active");
-      activeCategory = pill.dataset.cat;
-      renderProducts();
-    });
+document.querySelectorAll(".modal-close, .modal-overlay").forEach(el => {
+  el.addEventListener("click", (e) => {
+    if (e.target === el || e.target.classList.contains("modal-close")) {
+      el.closest(".modal-overlay")?.classList.remove("open");
+    }
   });
-  
-  document.getElementById("sort-select")?.addEventListener("change", e => {
-    activeSortVal = e.target.value;
+});
+
+// ---------- INITIALIZATION ----------
+document.getElementById("ai-recommend-btn")?.addEventListener("click", () => {
+  const height = document.getElementById("ai-height")?.value;
+  const weight = document.getElementById("ai-weight")?.value;
+  if (!height || !weight) return showToast("Enter height and weight", "error");
+  const result = recommendSize({ 
+    height, weight, 
+    usualSize: document.getElementById("ai-usual-size")?.value || "M", 
+    fit: document.getElementById("ai-fit")?.value || "regular" 
+  });
+  const el = document.getElementById("ai-result");
+  if (el) {
+    el.style.display = "block";
+    el.innerHTML = `<strong style="color:var(--red);font-size:1.2rem">${result.size}</strong><br/>${result.message}`;
+  }
+});
+
+document.querySelectorAll(".cat-pill").forEach(pill => {
+  pill.addEventListener("click", () => {
+    document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
+    pill.classList.add("active");
+    activeCategory = pill.dataset.cat;
     renderProducts();
   });
-  
-  // AI Size
-  document.getElementById("ai-recommend-btn")?.addEventListener("click", () => {
-    const height = document.getElementById("ai-height").value;
-    const weight = document.getElementById("ai-weight").value;
-    if (!height || !weight) return showToast("Enter height and weight", "error");
-    const result = recommendSize({ height, weight, usualSize: document.getElementById("ai-usual-size").value, fit: document.getElementById("ai-fit").value });
-    const el = document.getElementById("ai-result");
-    el.style.display = "block";
-    el.innerHTML = `<strong style="color:var(--red)">${result.size}</strong><br>${result.message}`;
-  });
-  
-  // Theme
-  document.getElementById("theme-toggle")?.addEventListener("click", () => {
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("aktivity_theme", document.body.classList.contains("light-mode") ? "light" : "dark");
-  });
-  if (localStorage.getItem("aktivity_theme") === "light") document.body.classList.add("light-mode");
-  
-  // Mobile nav
-  document.getElementById("hamburger")?.addEventListener("click", () => {
-    document.getElementById("hamburger").classList.toggle("open");
-    document.getElementById("mobile-nav").classList.toggle("open");
-    document.getElementById("mobile-overlay").classList.toggle("show");
-  });
-  
-  // Scroll reveal
-  const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting && e.target.classList.add("visible")), { threshold: 0.1 });
-  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-  
-  // Loading screen
-  setTimeout(() => document.getElementById("loading-screen")?.classList.add("hidden"), 1800);
-  
-  // Chatbot (simple)
-  const chatToggle = document.getElementById("chatbot-toggle");
-  const chatPanel = document.getElementById("chatbot-panel");
-  chatToggle?.addEventListener("click", () => chatPanel?.classList.toggle("open"));
 });
+
+document.getElementById("sort-select")?.addEventListener("change", e => {
+  activeSortVal = e.target.value;
+  renderProducts();
+});
+
+document.getElementById("theme-toggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("light-mode");
+  localStorage.setItem("aktivity_theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+});
+if (localStorage.getItem("aktivity_theme") === "light") document.body.classList.add("light-mode");
+
+document.getElementById("hamburger")?.addEventListener("click", () => {
+  document.getElementById("hamburger")?.classList.toggle("open");
+  document.getElementById("mobile-nav")?.classList.toggle("open");
+  document.getElementById("mobile-overlay")?.classList.toggle("show");
+});
+document.getElementById("mobile-overlay")?.addEventListener("click", () => {
+  document.getElementById("hamburger")?.classList.remove("open");
+  document.getElementById("mobile-nav")?.classList.remove("open");
+  document.getElementById("mobile-overlay")?.classList.remove("show");
+});
+
+document.getElementById("chatbot-toggle")?.addEventListener("click", () => {
+  document.getElementById("chatbot-panel")?.classList.toggle("open");
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); });
+}, { threshold: 0.1 });
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+updateCartBadge();
+loadProducts();
 </script>
 </body>
 </html>
