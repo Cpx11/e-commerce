@@ -118,6 +118,29 @@ nav.top.scrolled{background:rgba(14,14,16,.85);border-color:var(--line)}
 
 /* ---------- Product Card ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
+
+/* ADD THIS MEDIA QUERY AT THE BOTTOM OF YOUR CSS (near other @media rules) */
+@media(max-width: 768px){
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .card-body {
+    padding: 10px;
+  }
+  .card-name {
+    font-size: 12px;
+  }
+  .card-cat {
+    font-size: 9px;
+  }
+  .card-price strong {
+    font-size: 13px;
+  }
+  .add-mini {
+    font-size: 9px;
+  }
+}
 .card{background:var(--ash);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;transition:.4s cubic-bezier(.2,.8,.2,1);cursor:pointer}
 .card:hover{transform:translateY(-6px);border-color:var(--line-2);box-shadow:var(--shadow)}
 .card-img{aspect-ratio:4/5;background:linear-gradient(135deg,#1d1d22,#2a2a30);position:relative;overflow:hidden;display:grid;place-items:center}
