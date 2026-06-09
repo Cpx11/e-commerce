@@ -1499,7 +1499,7 @@ body.light-mode {
 <nav class="navbar">
   <a href="../index.html" class="nav-logo">AKTIVITY</a>
   <div class="nav-actions">
-    <a href="cart.html" class="cart-icon-wrap">
+    <a href="#" class="cart-icon-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="cart-badge">0</span>
     </a>
@@ -1626,16 +1626,17 @@ body.light-mode {
   </div>
 </div>
 
-<script>
-// ─────────────────────────────────────────────
-// AKTIVITY — Firebase Configuration
-// Replace the values below with your own project
-// ─────────────────────────────────────────────
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+<script type="module">
+// ============================================
+// AKTIVITY WITH FIREBASE BACKEND - WORKING
+// ============================================
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+// YOUR FIREBASE CONFIG (keep as is)
 const firebaseConfig = {
   apiKey: "AIzaSyA61SXnSJpWeULnFjw1plQq6xY88dy318A",
   authDomain: "e-commerce-9dd43.firebaseapp.com",
@@ -1645,65 +1646,33 @@ const firebaseConfig = {
   appId: "1:244726336780:web:57ea2d3f08b718dec60d29"
 };
 
-const app  = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db   = getFirestore(app);
-export const storage = getStorage(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Admin email list – replace with real admin emails
-export const ADMIN_EMAILS = ["admin@aktivity.com"];
-
-// ─────────────────────────────────────────────
-// AKTIVITY — Cart Utility
-// ─────────────────────────────────────────────
-
-export function getCart() {
+// ---------- CART (localStorage) ----------
+function getCart() {
   try { return JSON.parse(localStorage.getItem("aktivity_cart") || "[]"); }
   catch { return []; }
 }
 
-export function saveCart(cart) {
+function saveCart(cart) {
   localStorage.setItem("aktivity_cart", JSON.stringify(cart));
   updateCartBadge();
 }
 
-export function addToCart(product) {
+function addToCart(product) {
   const cart = getCart();
   const key = `${product.id}_${product.selectedSize}`;
   const existing = cart.find(i => i.key === key);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...product, key, qty: 1 });
-  }
+  if (existing) existing.qty += 1;
+  else cart.push({ ...product, key, qty: 1 });
   saveCart(cart);
-  cartBounce();
   showToast(`${product.name} added to cart`);
 }
 
-export function removeFromCart(key) {
-  saveCart(getCart().filter(i => i.key !== key));
-}
-
-export function updateQty(key, qty) {
-  const cart = getCart();
-  const item = cart.find(i => i.key === key);
-  if (item) {
-    item.qty = Math.max(1, qty);
-    saveCart(cart);
-  }
-}
-
-export function clearCart() {
-  localStorage.removeItem("aktivity_cart");
-  updateCartBadge();
-}
-
-export function cartTotal() {
-  return getCart().reduce((sum, i) => sum + i.price * i.qty, 0);
-}
-
-export function updateCartBadge() {
+function updateCartBadge() {
   const count = getCart().reduce((s, i) => s + i.qty, 0);
   document.querySelectorAll(".cart-badge").forEach(el => {
     el.textContent = count;
@@ -1711,16 +1680,7 @@ export function updateCartBadge() {
   });
 }
 
-function cartBounce() {
-  const icon = document.querySelector(".cart-icon-wrap");
-  if (!icon) return;
-  icon.classList.remove("cart-bounce");
-  void icon.offsetWidth;
-  icon.classList.add("cart-bounce");
-  setTimeout(() => icon.classList.remove("cart-bounce"), 600);
-}
-
-export function showToast(msg, type = "success") {
+function showToast(msg, type = "success") {
   let container = document.getElementById("toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -1731,889 +1691,219 @@ export function showToast(msg, type = "success") {
   toast.className = `toast toast-${type}`;
   toast.textContent = msg;
   container.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add("toast-visible"));
+  setTimeout(() => toast.classList.add("toast-visible"), 10);
   setTimeout(() => {
     toast.classList.remove("toast-visible");
     setTimeout(() => toast.remove(), 400);
   }, 3000);
 }
-// ─────────────────────────────────────────────
-// AKTIVITY — AI Size Recommender
-// ─────────────────────────────────────────────
 
-export function recommendSize({ height, weight, usualSize, fit }) {
-  // Height in cm, weight in kg
+// ---------- AI SIZE ----------
+function recommendSize({ height, weight, usualSize, fit }) {
   const h = parseFloat(height);
   const w = parseFloat(weight);
-
-  // BMI-style sizing index
   const bmi = w / ((h / 100) ** 2);
-
   let base;
-  if (bmi < 18.5)       base = "XS";
-  else if (bmi < 22)    base = "S";
-  else if (bmi < 25)    base = "M";
-  else if (bmi < 28)    base = "L";
-  else if (bmi < 32)    base = "XL";
-  else                  base = "XXL";
-
+  if (bmi < 18.5) base = "XS";
+  else if (bmi < 22) base = "S";
+  else if (bmi < 25) base = "M";
+  else if (bmi < 28) base = "L";
+  else if (bmi < 32) base = "XL";
+  else base = "XXL";
   const sizes = ["XS","S","M","L","XL","XXL"];
   let idx = sizes.indexOf(base);
-
-  // Adjust for fit preference
-  if (fit === "loose")  idx = Math.min(idx + 1, sizes.length - 1);
-  if (fit === "slim")   idx = Math.max(idx - 1, 0);
-
-  // Blend with usual size (soft influence)
+  if (fit === "loose") idx = Math.min(idx + 1, sizes.length - 1);
+  if (fit === "slim") idx = Math.max(idx - 1, 0);
   const usualIdx = sizes.indexOf(usualSize.toUpperCase());
-  if (usualIdx !== -1) {
-    idx = Math.round((idx + usualIdx) / 2);
-  }
-
-  const recommended = sizes[idx];
-
-  const messages = {
-    XS: "You lean on the lean side — XS gives you that sharp, tailored cut.",
-    S:  "Clean and fitted — S keeps the proportions tight without constricting.",
-    M:  "M is your sweet spot. Versatile, comfortable, and always looks intentional.",
-    L:  "L gives you room without going oversized. Perfect balance.",
-    XL: "XL hits that oversized-done-right energy. Streetwear certified.",
-    XXL:"XXL — full drape, full presence. Bold and deliberate."
-  };
-
-  return {
-    size: recommended,
-    message: `We recommend **${recommended}** — ${messages[recommended]}`
-  };
+  if (usualIdx !== -1) idx = Math.round((idx + usualIdx) / 2);
+  return { size: sizes[idx], message: `We recommend ${sizes[idx]} for your measurements.` };
 }
 
-// ─────────────────────────────────────────────
-// AKTIVITY — Store JS
-// ─────────────────────────────────────────────
-import { auth, db, ADMIN_EMAILS } from "./firebase-config.js";
-import {
-  onAuthStateChanged, signInWithEmailAndPassword,
-  createUserWithEmailAndPassword, signOut,
-  sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  collection, query, getDocs, doc, getDoc,
-  addDoc, onSnapshot, where, orderBy, limit,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { addToCart, updateCartBadge, showToast } from "./cart.js";
-import { recommendSize } from "./size-recommender.js";
-
-// ── Loading screen ──────────────────────────
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.getElementById("loading-screen")?.classList.add("hidden");
-  }, 2000);
-});
-
-// ── Custom cursor ────────────────────────────
-(function initCursor() {
-  const cursor = document.getElementById("cursor");
-  const ring   = document.getElementById("cursor-ring");
-  if (!cursor || !ring) return;
-  let mx = 0, my = 0, rx = 0, ry = 0;
-  document.addEventListener("mousemove", e => { mx = e.clientX; my = e.clientY; });
-  function animCursor() {
-    cursor.style.left = mx + "px";
-    cursor.style.top  = my + "px";
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + "px";
-    ring.style.top  = ry + "px";
-    requestAnimationFrame(animCursor);
-  }
-  animCursor();
-  document.querySelectorAll("a, button").forEach(el => {
-    el.addEventListener("mouseenter", () => {
-      cursor.style.width = "20px"; cursor.style.height = "20px";
-      ring.style.width = "50px"; ring.style.height = "50px";
-    });
-    el.addEventListener("mouseleave", () => {
-      cursor.style.width = ""; cursor.style.height = "";
-      ring.style.width = ""; ring.style.height = "";
-    });
-  });
-})();
-
-// ── Navbar scroll ────────────────────────────
-window.addEventListener("scroll", () => {
-  document.getElementById("navbar")?.classList.toggle("scrolled", window.scrollY > 50);
-});
-
-// ── Mobile nav ───────────────────────────────
-document.getElementById("hamburger")?.addEventListener("click", () => {
-  document.getElementById("hamburger").classList.toggle("open");
-  document.getElementById("mobile-nav").classList.toggle("open");
-  document.getElementById("mobile-overlay").classList.toggle("show");
-});
-document.getElementById("mobile-overlay")?.addEventListener("click", () => {
-  document.getElementById("hamburger")?.classList.remove("open");
-  document.getElementById("mobile-nav")?.classList.remove("open");
-  document.getElementById("mobile-overlay")?.classList.remove("show");
-});
-
-// ── Scroll reveal ─────────────────────────────
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); revealObs.unobserve(e.target); } });
-}, { threshold: 0.1 });
-document.querySelectorAll(".reveal").forEach(el => revealObs.observe(el));
-
-// ── Button ripple ─────────────────────────────
-document.addEventListener("click", e => {
-  const btn = e.target.closest(".btn");
-  if (!btn) return;
-  const r = document.createElement("span");
-  r.className = "btn-ripple";
-  const rect = btn.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height);
-  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
-  btn.appendChild(r);
-  setTimeout(() => r.remove(), 700);
-});
-
-// ── Dark/Light mode ───────────────────────────
-const themeToggle = document.getElementById("theme-toggle");
-const savedTheme = localStorage.getItem("aktivity_theme");
-if (savedTheme === "light") document.body.classList.add("light-mode");
-themeToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("light-mode");
-  localStorage.setItem("aktivity_theme", document.body.classList.contains("light-mode") ? "light" : "dark");
-});
-
-// ── Cart badge init ───────────────────────────
-updateCartBadge();
-
-// ── Auth state ────────────────────────────────
-let currentUser = null;
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  const authBtn = document.getElementById("auth-btn");
-  const mobileAuthBtn = document.getElementById("mobile-auth-btn");
-  if (user) {
-    if (authBtn) authBtn.textContent = "Sign Out";
-    if (mobileAuthBtn) mobileAuthBtn.textContent = "Sign Out";
-    if (ADMIN_EMAILS.includes(user.email)) {
-      const adminLink = document.getElementById("nav-admin-link");
-      if (adminLink) { adminLink.style.display = "block"; adminLink.href = "pages/admin.html"; }
-    }
-    listenNotifications(user.uid);
-  } else {
-    if (authBtn) authBtn.textContent = "Sign In";
-    if (mobileAuthBtn) mobileAuthBtn.textContent = "Sign In";
-  }
-});
-
-// ── Auth button ───────────────────────────────
-function handleAuthBtnClick() {
-  if (currentUser) {
-    signOut(auth).then(() => showToast("Signed out"));
-  } else {
-    openModal("auth-modal");
-  }
-}
-document.getElementById("auth-btn")?.addEventListener("click", handleAuthBtnClick);
-document.getElementById("mobile-auth-btn")?.addEventListener("click", handleAuthBtnClick);
-
-// ── Auth modal ────────────────────────────────
-let isSignup = false;
-document.getElementById("auth-modal-close")?.addEventListener("click", () => closeModal("auth-modal"));
-document.getElementById("auth-toggle-btn")?.addEventListener("click", () => {
-  isSignup = !isSignup;
-  document.getElementById("auth-modal-title").textContent = isSignup ? "Create Account" : "Sign In";
-  document.getElementById("auth-submit-btn").textContent   = isSignup ? "Create Account" : "Sign In";
-  document.getElementById("auth-toggle-text").textContent  = isSignup ? "Already have an account?" : "Don't have an account?";
-  document.getElementById("auth-toggle-btn").textContent   = isSignup ? "Sign In" : "Sign Up";
-});
-document.getElementById("auth-submit-btn")?.addEventListener("click", async () => {
-  const email    = document.getElementById("auth-email").value.trim();
-  const password = document.getElementById("auth-password").value;
-  if (!email || !password) return showToast("Fill in all fields", "error");
-  try {
-    if (isSignup) {
-      await createUserWithEmailAndPassword(auth, email, password);
-      showToast("Account created! Welcome to AKTIVITY.");
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-      showToast("Welcome back!");
-    }
-    closeModal("auth-modal");
-  } catch (err) {
-    showToast(err.message, "error");
-  }
-});
-document.getElementById("auth-google-btn")?.addEventListener("click", async () => {
-  try {
-    await signInWithPopup(auth, new GoogleAuthProvider());
-    showToast("Signed in with Google!");
-    closeModal("auth-modal");
-  } catch (err) {
-    showToast(err.message, "error");
-  }
-});
-document.getElementById("auth-reset-btn")?.addEventListener("click", async () => {
-  const email = document.getElementById("auth-email").value.trim();
-  if (!email) return showToast("Enter your email first", "error");
-  await sendPasswordResetEmail(auth, email);
-  showToast("Password reset email sent");
-});
-
-// ── Notifications ─────────────────────────────
-function listenNotifications(uid) {
-  const q = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false), orderBy("createdAt", "desc"), limit(20));
-  onSnapshot(q, snap => {
-    const dot = document.getElementById("notif-dot");
-    const list = document.getElementById("notif-list");
-    if (!dot || !list) return;
-    if (!snap.empty) dot.style.display = "block";
-    else { dot.style.display = "none"; list.innerHTML = '<div class="notif-empty">No new notifications</div>'; return; }
-    list.innerHTML = snap.docs.map(d => `
-      <div class="notif-item">
-        <div class="notif-item-msg">${d.data().message}</div>
-        <div class="notif-item-time">${formatTime(d.data().createdAt?.toDate())}</div>
-      </div>`).join("");
-  });
-}
-document.getElementById("notif-btn")?.addEventListener("click", () => {
-  const panel = document.getElementById("notif-panel");
-  panel.style.display = panel.style.display === "none" ? "block" : "none";
-});
-document.getElementById("notif-clear")?.addEventListener("click", () => {
-  document.getElementById("notif-panel").style.display = "none";
-});
-
-// ── Modal helpers ─────────────────────────────
-function openModal(id) { document.getElementById(id)?.classList.add("open"); }
-function closeModal(id) { document.getElementById(id)?.classList.remove("open"); }
-document.querySelectorAll(".modal-overlay").forEach(overlay => {
-  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
-});
-document.getElementById("modal-close")?.addEventListener("click", () => closeModal("product-modal"));
-document.getElementById("size-modal-close")?.addEventListener("click", () => closeModal("size-modal"));
-document.getElementById("auth-modal-close")?.addEventListener("click", () => closeModal("auth-modal"));
-
-// ── Products ──────────────────────────────────
+// ---------- PRODUCT DATA (Firebase first, then fallback) ----------
 let allProducts = [];
 let activeCategory = "all";
-let activeSortVal  = "default";
+let activeSortVal = "default";
+
 const DEMO_PRODUCTS = [
-  { id: "p1", name: "VOID HOODIE", category: "shirts", price: 12500, sizes: ["S","M","L","XL"], stock: 10, images: ["https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80"], description: "Heavyweight fleece hoodie. Dropped shoulders, kangaroo pocket.", featured: true },
-  { id: "p2", name: "CHROME NECKLACE", category: "necklaces", price: 8900, sizes: ["One Size"], stock: 5, images: ["https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80"], description: "Sterling silver chain. 20\" length. Streetwear essential.", featured: true },
-  { id: "p3", name: "GHOST KICKS", category: "kicks", price: 45000, sizes: ["40","41","42","43","44"], stock: 3, images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80"], description: "Chunky silhouette. Foam midsole. Ghost colorway exclusive.", featured: true },
-  { id: "p4", name: "TACTICAL CARGO", category: "trousers", price: 18500, sizes: ["S","M","L","XL","XXL"], stock: 8, images: ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80"], description: "6-pocket utility trouser. Tapered fit. Ripstop fabric." },
-  { id: "p5", name: "SYSTEM FULL SET", category: "outfits", price: 65000, sizes: ["S","M","L","XL"], stock: 4, images: ["https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80"], description: "Matched two-piece. Jacket + trousers. Limited.", featured: false },
-  { id: "p6", name: "CORE TEE BLACK", category: "shirts", price: 6500, sizes: ["XS","S","M","L","XL","XXL"], stock: 25, images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"], description: "300gsm cotton. Boxy fit. Embossed AKTIVITY logo." },
-  { id: "p7", name: "LAYER CHAIN", category: "necklaces", price: 11000, sizes: ["One Size"], stock: 7, images: ["https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80"], description: "Multi-layer chain set. Gold-plated stainless." },
-  { id: "p8", name: "LOW RUNNER", category: "kicks", price: 39000, sizes: ["38","39","40","41","42","43"], stock: 0, images: ["https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80"], description: "Low-profile runner. Full-length cushion sole.", salePrice: 32000 },
+  { id: "p1", name: "VOID HOODIE", category: "shirts", price: 12500, sizes: ["S","M","L","XL"], stock: 10, images: ["https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80"], description: "Heavyweight fleece hoodie.", featured: true },
+  { id: "p2", name: "CHROME NECKLACE", category: "necklaces", price: 8900, sizes: ["One Size"], stock: 5, images: ["https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80"], description: "Sterling silver chain.", featured: true },
+  { id: "p3", name: "GHOST KICKS", category: "kicks", price: 45000, sizes: ["40","41","42","43","44"], stock: 3, images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80"], description: "Chunky silhouette.", featured: true },
+  { id: "p4", name: "TACTICAL CARGO", category: "trousers", price: 18500, sizes: ["S","M","L","XL","XXL"], stock: 8, images: ["https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80"], description: "6-pocket utility trouser.", featured: false },
+  { id: "p5", name: "SYSTEM FULL SET", category: "outfits", price: 65000, sizes: ["S","M","L","XL"], stock: 4, images: ["https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80"], description: "Matched two-piece.", featured: false },
+  { id: "p6", name: "CORE TEE BLACK", category: "shirts", price: 6500, sizes: ["XS","S","M","L","XL","XXL"], stock: 25, images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"], description: "300gsm cotton tee.", featured: false },
+  { id: "p7", name: "LAYER CHAIN", category: "necklaces", price: 11000, sizes: ["One Size"], stock: 7, images: ["https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80"], description: "Multi-layer chain set.", featured: false },
+  { id: "p8", name: "LOW RUNNER", category: "kicks", price: 39000, salePrice: 32000, sizes: ["38","39","40","41","42","43"], stock: 0, images: ["https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80"], description: "Low-profile runner.", featured: false },
 ];
 
 async function loadProducts() {
   try {
     const snap = await getDocs(collection(db, "products"));
-    if (!snap.empty) {
-      allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } else {
-      allProducts = DEMO_PRODUCTS;
-    }
-  } catch {
+    if (!snap.empty) allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    else allProducts = DEMO_PRODUCTS;
+  } catch (error) {
+    console.warn("Firestore error, using demo products:", error);
     allProducts = DEMO_PRODUCTS;
   }
   renderProducts();
   renderFeatured();
 }
-loadProducts();
-
-function filterAndSort(products) {
-  let list = activeCategory === "all" ? products : products.filter(p => p.category === activeCategory);
-  if (activeSortVal === "price-asc")  list = [...list].sort((a, b) => a.price - b.price);
-  if (activeSortVal === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
-  if (activeSortVal === "newest")     list = [...list].reverse();
-  return list;
-}
 
 function renderProducts() {
   const grid = document.getElementById("products-grid");
   if (!grid) return;
-  const list = filterAndSort(allProducts);
-  if (list.length === 0) { grid.innerHTML = '<p style="text-align:center;color:var(--grey);padding:3rem">No products found.</p>'; return; }
-  grid.innerHTML = list.map(p => productCardHTML(p)).join("");
-  // Attach events
-  grid.querySelectorAll(".add-cart-btn").forEach(btn => {
+  let list = [...allProducts];
+  if (activeCategory !== "all") list = list.filter(p => p.category === activeCategory);
+  if (activeSortVal === "price-asc") list.sort((a, b) => a.price - b.price);
+  if (activeSortVal === "price-desc") list.sort((a, b) => b.price - a.price);
+  
+  grid.innerHTML = list.map(p => `
+    <div class="product-card reveal" data-pid="${p.id}">
+      <div class="product-card-img"><img src="${p.images?.[0] || ''}" loading="lazy"></div>
+      <div class="product-card-body">
+        <div class="product-card-name">${p.name}</div>
+        <div class="product-card-price">₦${p.price.toLocaleString()}</div>
+        <div class="size-selector" data-pid="${p.id}">
+          <div class="size-grid">${(p.sizes || []).map((s, i) => `<button class="size-btn${i === 0 ? ' selected' : ''}" data-size="${s}">${s}</button>`).join("")}</div>
+        </div>
+        <button class="btn btn-primary add-cart-btn" data-pid="${p.id}">Add to Cart</button>
+      </div>
+    </div>
+  `).join("");
+  
+  document.querySelectorAll(".add-cart-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const pid = btn.dataset.pid;
       const product = allProducts.find(p => p.id === pid);
-      if (!product) return;
-      const sizeBtn = document.querySelector(`.size-selector[data-pid="${pid}"] .size-btn.selected`);
-      const selectedSize = sizeBtn?.dataset.size || product.sizes?.[0] || "One Size";
-      addToCart({ ...product, selectedSize });
+      const container = btn.closest(".product-card");
+      const sizeBtn = container?.querySelector(".size-btn.selected");
+      if (product) addToCart({ ...product, selectedSize: sizeBtn?.dataset.size || product.sizes?.[0] });
     });
   });
-  grid.querySelectorAll(".size-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const pid = btn.closest(".size-selector")?.dataset.pid;
-      document.querySelectorAll(`.size-selector[data-pid="${pid}"] .size-btn`).forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-    });
-  });
-  grid.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("click", () => openProductModal(card.dataset.pid));
-    card.addEventListener("mousemove", e => tiltCard(card, e));
-    card.addEventListener("mouseleave", () => { card.style.transform = ""; });
-  });
-  grid.querySelectorAll(".wishlist-btn").forEach(btn => {
-    btn.addEventListener("click", e => { e.stopPropagation(); toggleWishlist(btn); });
-  });
-  // Reveal
-  grid.querySelectorAll(".product-card").forEach(el => revealObs.observe(el));
 }
 
 function renderFeatured() {
   const grid = document.getElementById("featured-grid");
   if (!grid) return;
   const featured = allProducts.filter(p => p.featured).slice(0, 3);
-  grid.innerHTML = featured.map(p => productCardHTML(p)).join("");
-  grid.querySelectorAll(".product-card").forEach(card => {
-    card.addEventListener("click", () => openProductModal(card.dataset.pid));
-    revealObs.observe(card);
-  });
-  grid.querySelectorAll(".size-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const pid = btn.closest(".size-selector")?.dataset.pid;
-      document.querySelectorAll(`.size-selector[data-pid="${pid}"] .size-btn`).forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-    });
-  });
-  grid.querySelectorAll(".add-cart-btn").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const pid = btn.dataset.pid;
-      const product = allProducts.find(p => p.id === pid);
-      if (!product) return;
-      const sizeBtn = document.querySelector(`.size-selector[data-pid="${pid}"] .size-btn.selected`);
-      const selectedSize = sizeBtn?.dataset.size || product.sizes?.[0] || "One Size";
-      addToCart({ ...product, selectedSize });
+  grid.innerHTML = featured.map(p => `
+    <div class="product-card" data-pid="${p.id}">
+      <div class="product-card-img"><img src="${p.images?.[0] || ''}"></div>
+      <div class="product-card-body"><div class="product-card-name">${p.name}</div><div class="product-card-price">₦${p.price.toLocaleString()}</div>
+      <button class="btn btn-primary add-cart-btn" data-pid="${p.id}">Add to Cart</button></div>
+    </div>
+  `).join("");
+  document.querySelectorAll("#featured-grid .add-cart-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const product = allProducts.find(p => p.id === btn.dataset.pid);
+      if (product) addToCart({ ...product, selectedSize: product.sizes?.[0] });
     });
   });
 }
 
-function productCardHTML(p) {
-  const img = p.images?.[0] || "https://via.placeholder.com/400x400/1A1A1A/666?text=AKTIVITY";
-  const outOfStock = (p.stock || 0) === 0;
-  const firstSize = p.sizes?.[0] || "One Size";
-  return `
-  <div class="product-card reveal" data-pid="${p.id}" data-category="${p.category}">
-    <div class="product-card-img">
-      <img src="${img}" alt="${p.name}" loading="lazy"/>
-      ${p.category === "shirts" || p.category === "trousers" || p.category === "outfits" ? '<div class="cloth-ripple"></div>' : ''}
-      ${outOfStock ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center"><span class="badge badge-red">SOLD OUT</span></div>' : ''}
-      ${p.salePrice ? '<div style="position:absolute;top:0.5rem;left:0.5rem"><span class="badge badge-sale">SALE</span></div>' : ''}
-    </div>
-    <div class="product-card-body">
-      <div class="product-card-name">${p.name}</div>
-      <div class="product-card-price">
-        ${p.salePrice ? `<span class="original">₦${p.price.toLocaleString()}</span>₦${p.salePrice.toLocaleString()}` : `₦${p.price.toLocaleString()}`}
-      </div>
-      <div class="size-selector" data-pid="${p.id}" style="margin-top:0.6rem">
-        <div class="size-grid">
-          ${(p.sizes || []).map((s, i) => `<button class="size-btn${i===0?' selected':''}" data-size="${s}"${outOfStock?' disabled':''} >${s}</button>`).join("")}
-        </div>
-      </div>
-      <div class="product-card-actions">
-        <button class="btn btn-primary" style="flex:1;padding:0.6rem" data-pid="${p.id}" ${outOfStock ? "disabled style='opacity:0.5;cursor:not-allowed'" : ""} class="add-cart-btn">
-          ${outOfStock ? "Sold Out" : "Add to Cart"}
-        </button>
-        <button class="btn btn-secondary wishlist-btn" data-pid="${p.id}" title="Wishlist" style="padding:0.6rem">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </button>
-      </div>
-      ${outOfStock ? `<button class="btn btn-secondary btn-full" style="margin-top:0.4rem;font-size:0.7rem" onclick="preOrderProduct('${p.id}')">Pre-Order</button>` : ""}
-    </div>
-  </div>`;
-}
+// ---------- AUTH ----------
+let currentUser = null;
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  const authBtn = document.getElementById("auth-btn");
+  if (authBtn) authBtn.textContent = user ? "Sign Out" : "Sign In";
+});
 
-// Fix: re-attach "add-cart-btn" class after innerHTML (was overridden by disabled attr)
-// (handled via querySelector above)
+document.getElementById("auth-btn")?.addEventListener("click", () => {
+  if (currentUser) signOut(auth).then(() => showToast("Signed out"));
+  else openModal("auth-modal");
+});
 
-// ── Product modal ─────────────────────────────
-function openProductModal(pid) {
-  const product = allProducts.find(p => p.id === pid);
-  if (!product) return;
-  document.getElementById("modal-product-name").textContent = product.name;
-  const body = document.getElementById("product-modal-body");
-  const imgs = product.images || [];
-  const outOfStock = (product.stock || 0) === 0;
-  body.innerHTML = `
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-    <div>
-      <div class="img-carousel" id="modal-carousel">
-        ${imgs.map((img, i) => `<img src="${img}" alt="${product.name}" class="${i===0?'active':''}" />`).join("")}
-        ${imgs.length > 1 ? `
-        <div class="carousel-dots">${imgs.map((_, i) => `<div class="carousel-dot${i===0?' active':''}" data-i="${i}"></div>`).join("")}</div>
-        <button class="carousel-arrow carousel-arrow-prev" id="carr-prev">‹</button>
-        <button class="carousel-arrow carousel-arrow-next" id="carr-next">›</button>
-        ` : ""}
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:1rem">
-      <div>
-        <span class="badge badge-silver">${product.category?.toUpperCase()}</span>
-        <div style="font-family:var(--font-display);font-size:2rem;letter-spacing:0.05em;color:var(--white);margin-top:0.5rem">${product.name}</div>
-        <div style="font-size:1.4rem;font-weight:700;color:var(--silver);margin-top:0.3rem">
-          ${product.salePrice ? `<span style="text-decoration:line-through;color:var(--grey);font-size:1rem;margin-right:0.5rem">₦${product.price.toLocaleString()}</span>₦${product.salePrice.toLocaleString()}` : `₦${product.price.toLocaleString()}`}
-        </div>
-      </div>
-      <p style="font-size:0.85rem;color:var(--grey)">${product.description || ""}</p>
-      <div>
-        <div style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--grey);margin-bottom:0.5rem">Select Size</div>
-        <div class="size-grid" id="modal-size-grid">
-          ${(product.sizes || []).map((s, i) => `<button class="size-btn${i===0?' selected':''}" data-size="${s}">${s}</button>`).join("")}
-        </div>
-        <button id="modal-ai-size-btn" style="font-size:0.72rem;color:var(--red);background:none;border:none;margin-top:0.5rem;letter-spacing:0.05em">✦ AI Size Finder</button>
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-direction:column">
-        <button class="btn btn-primary btn-full" id="modal-add-cart" ${outOfStock?"disabled style='opacity:0.5'":''}>${outOfStock?"Sold Out":"Add to Cart"}</button>
-        <button class="btn btn-secondary btn-full" id="modal-wishlist">Save to Wishlist</button>
-      </div>
-      <div style="font-size:0.75rem;color:var(--grey)">Stock: ${product.stock || 0} remaining</div>
-    </div>
-  </div>`;
+document.getElementById("auth-submit-btn")?.addEventListener("click", async () => {
+  const email = document.getElementById("auth-email").value;
+  const password = document.getElementById("auth-password").value;
+  const isSignup = document.getElementById("auth-modal-title").textContent === "Create Account";
+  try {
+    if (isSignup) await createUserWithEmailAndPassword(auth, email, password);
+    else await signInWithEmailAndPassword(auth, email, password);
+    showToast(isSignup ? "Account created!" : "Welcome back!");
+    closeModal("auth-modal");
+  } catch (err) { showToast(err.message, "error"); }
+});
 
-  // Carousel
-  let currentImg = 0;
-  function setImg(i) {
-    const imgEls = document.querySelectorAll("#modal-carousel img");
-    const dots   = document.querySelectorAll("#modal-carousel .carousel-dot");
-    imgEls.forEach((el, idx) => el.classList.toggle("active", idx === i));
-    dots.forEach((el, idx) => el.classList.toggle("active", idx === i));
-    currentImg = i;
-  }
-  document.getElementById("carr-prev")?.addEventListener("click", () => setImg((currentImg - 1 + imgs.length) % imgs.length));
-  document.getElementById("carr-next")?.addEventListener("click", () => setImg((currentImg + 1) % imgs.length));
+document.getElementById("auth-google-btn")?.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    showToast("Signed in with Google!");
+    closeModal("auth-modal");
+  } catch (err) { showToast(err.message, "error"); }
+});
 
-  // Size grid
-  document.querySelectorAll("#modal-size-grid .size-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#modal-size-grid .size-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
+document.getElementById("auth-toggle-btn")?.addEventListener("click", () => {
+  const isSignup = document.getElementById("auth-modal-title").textContent === "Sign In";
+  document.getElementById("auth-modal-title").textContent = isSignup ? "Create Account" : "Sign In";
+  document.getElementById("auth-submit-btn").textContent = isSignup ? "Create Account" : "Sign In";
+});
+
+// ---------- MODALS ----------
+function openModal(id) { document.getElementById(id)?.classList.add("open"); }
+function closeModal(id) { document.getElementById(id)?.classList.remove("open"); }
+document.querySelectorAll(".modal-overlay").forEach(overlay => {
+  overlay.addEventListener("click", e => { if (e.target === overlay) overlay.classList.remove("open"); });
+});
+
+// ---------- INIT ----------
+window.addEventListener("DOMContentLoaded", () => {
+  loadProducts();
+  updateCartBadge();
+  
+  // Filters
+  document.querySelectorAll(".cat-pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      activeCategory = pill.dataset.cat;
+      renderProducts();
     });
   });
-
-  // Add to cart
-  document.getElementById("modal-add-cart")?.addEventListener("click", () => {
-    const sizeBtn = document.querySelector("#modal-size-grid .size-btn.selected");
-    addToCart({ ...product, selectedSize: sizeBtn?.dataset.size || product.sizes?.[0] || "One Size" });
-    closeModal("product-modal");
-  });
-
-  // AI size
-  document.getElementById("modal-ai-size-btn")?.addEventListener("click", () => {
-    closeModal("product-modal");
-    setTimeout(() => openModal("size-modal"), 300);
-  });
-
-  openModal("product-modal");
-}
-
-// ── Category filter ───────────────────────────
-document.querySelectorAll(".cat-pill").forEach(pill => {
-  pill.addEventListener("click", () => {
-    document.querySelectorAll(".cat-pill").forEach(p => p.classList.remove("active"));
-    pill.classList.add("active");
-    activeCategory = pill.dataset.cat;
+  
+  document.getElementById("sort-select")?.addEventListener("change", e => {
+    activeSortVal = e.target.value;
     renderProducts();
   });
-});
-document.getElementById("sort-select")?.addEventListener("change", e => {
-  activeSortVal = e.target.value;
-  renderProducts();
-});
-
-// ── 3D Tilt ───────────────────────────────────
-function tiltCard(card, e) {
-  const rect = card.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top  + rect.height / 2;
-  const dx = (e.clientX - cx) / (rect.width / 2);
-  const dy = (e.clientY - cy) / (rect.height / 2);
-  card.style.transform = `perspective(800px) rotateY(${dx * 6}deg) rotateX(${-dy * 4}deg) translateY(-8px) scale(1.01)`;
-}
-
-// ── Wishlist ──────────────────────────────────
-function toggleWishlist(btn) {
-  btn.classList.toggle("active");
-  btn.classList.add("pulse");
-  setTimeout(() => btn.classList.remove("pulse"), 400);
-  const pid = btn.dataset.pid;
-  let wl = JSON.parse(localStorage.getItem("aktivity_wishlist") || "[]");
-  if (btn.classList.contains("active")) {
-    if (!wl.includes(pid)) wl.push(pid);
-    showToast("Added to wishlist");
-  } else {
-    wl = wl.filter(id => id !== pid);
-    showToast("Removed from wishlist");
-  }
-  localStorage.setItem("aktivity_wishlist", JSON.stringify(wl));
-}
-window.preOrderProduct = function(pid) {
-  if (!currentUser) { openModal("auth-modal"); return; }
-  showToast("Pre-order registered! We'll notify you when it drops.", "info");
-};
-
-// ── AI Size Recommender ───────────────────────
-document.getElementById("ai-recommend-btn")?.addEventListener("click", () => {
-  const height = document.getElementById("ai-height").value;
-  const weight = document.getElementById("ai-weight").value;
-  const usualSize = document.getElementById("ai-usual-size").value;
-  const fit = document.getElementById("ai-fit").value;
-  if (!height || !weight) return showToast("Enter height and weight", "error");
-  const result = recommendSize({ height, weight, usualSize, fit });
-  const resultEl = document.getElementById("ai-result");
-  resultEl.style.display = "block";
-  resultEl.innerHTML = `<strong style="color:var(--red);font-size:1.2rem">${result.size}</strong><br/><span style="color:var(--silver)">${result.message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</span>`;
-});
-
-// ── Ads carousel ──────────────────────────────
-async function loadAds() {
-  try {
-    const snap = await getDocs(collection(db, "ads"));
-    if (snap.empty) return;
-    const ads = snap.docs.map(d => d.data());
-    const container = document.getElementById("ads-carousel");
-    container.innerHTML = ads.map((ad, i) => `
-      <a href="${ad.link||'#'}" class="ad-slide${i===0?' active':''}" target="${ad.link?'_blank':'_self'}">
-        <img src="${ad.image}" alt="${ad.title||'Ad'}" style="object-fit:cover;width:100%;height:100%"/>
-        <div class="ad-slide-content">
-          <div style="font-family:var(--font-display);font-size:2rem;letter-spacing:0.2em;color:var(--white)">${ad.title||''}</div>
-          ${ad.subtitle?`<div style="font-family:var(--font-ui);font-size:0.75rem;letter-spacing:0.15em;color:var(--grey);margin-top:0.5rem">${ad.subtitle}</div>`:''}
-        </div>
-      </a>`).join("");
-    let adIdx = 0;
-    setInterval(() => {
-      const slides = document.querySelectorAll(".ad-slide");
-      slides.forEach(s => s.classList.remove("active"));
-      adIdx = (adIdx + 1) % slides.length;
-      slides[adIdx]?.classList.add("active");
-    }, 5000);
-  } catch {}
-}
-loadAds();
-
-// ── Chatbot ───────────────────────────────────
-const chatToggle  = document.getElementById("chatbot-toggle");
-const chatPanel   = document.getElementById("chatbot-panel");
-const chatInput   = document.getElementById("chatbot-input");
-const chatSend    = document.getElementById("chatbot-send");
-const chatMsgs    = document.getElementById("chatbot-messages");
-chatToggle?.addEventListener("click", () => chatPanel?.classList.toggle("open"));
-
-const FAQ = [
-  { q: ["size","sizing","fit","large","small"], a: "Use our AI Size Finder on any product page! It takes your height, weight, and fit preference to recommend the perfect size. 🎯" },
-  { q: ["return","refund","exchange"], a: "Returns accepted within 14 days of delivery. Item must be unworn with tags. Start a return from your Orders page. 📦" },
-  { q: ["payment","pay","bank","card","transfer"], a: "We accept Bank Transfer, Debit/Credit Card, and Crypto. Bank transfer requires receipt upload and admin verification." },
-  { q: ["ship","shipping","delivery","track"], a: "Lagos: 1-2 days. Other states: 2-5 days. International: 7-14 days. Track your order from the Orders page. 🚀" },
-  { q: ["discount","code","referral","promo"], a: "Share your referral code from the Profile page — you and your friend both get ₦1,000 off the next order. 🔥" },
-  { q: ["stock","sold out","preorder","pre-order"], a: "Sold-out items can be pre-ordered — click 'Pre-Order' on the product. We'll notify you when it drops. ⚡" },
-  { q: ["contact","help","support"], a: "Email us at support@aktivity.com or DM us on Instagram @aktivity.official. We're fast. 💬" },
-];
-
-function chatbotReply(msg) {
-  const lower = msg.toLowerCase();
-  const match = FAQ.find(f => f.q.some(kw => lower.includes(kw)));
-  return match ? match.a : "I'm not sure about that — but our team can help! Hit us at support@aktivity.com. 🙏";
-}
-
-function sendChatMessage() {
-  const msg = chatInput?.value.trim();
-  if (!msg) return;
-  appendChatMsg(msg, "user");
-  chatInput.value = "";
-  setTimeout(() => appendChatMsg(chatbotReply(msg), "bot"), 600);
-}
-chatSend?.addEventListener("click", sendChatMessage);
-chatInput?.addEventListener("keydown", e => { if (e.key === "Enter") sendChatMessage(); });
-
-function appendChatMsg(text, role) {
-  const el = document.createElement("div");
-  el.className = `chat-msg ${role}`;
-  el.textContent = text;
-  chatMsgs?.appendChild(el);
-  chatMsgs.scrollTop = chatMsgs.scrollHeight;
-}
-
-// ── Confetti ──────────────────────────────────
-window.launchConfetti = function() {
-  const canvas = document.getElementById("confetti-canvas");
-  if (!canvas) return;
-  canvas.width  = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const ctx = canvas.getContext("2d");
-  const particles = Array.from({ length: 120 }, () => ({
-    x: Math.random() * canvas.width,
-    y: -10,
-    r: Math.random() * 6 + 3,
-    vx: (Math.random() - 0.5) * 4,
-    vy: Math.random() * 3 + 2,
-    color: ["#FF2A2A","#E0E0E0","#FFFFFF","#F5F5F5"][Math.floor(Math.random() * 4)],
-    alpha: 1,
-    rot: Math.random() * 360,
-    rotSpeed: (Math.random() - 0.5) * 5,
-  }));
-  let frame = 0;
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      ctx.save();
-      ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = p.color;
-      ctx.translate(p.x, p.y);
-      ctx.rotate((p.rot * Math.PI) / 180);
-      ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
-      ctx.restore();
-      p.x += p.vx; p.y += p.vy;
-      p.rot += p.rotSpeed;
-      if (p.y > canvas.height * 0.7) p.alpha -= 0.02;
-    });
-    frame++;
-    if (frame < 180) requestAnimationFrame(draw);
-    else ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-  draw();
-};
-
-// ── Helpers ───────────────────────────────────
-function formatTime(date) {
-  if (!date) return "";
-  const diff = Date.now() - date.getTime();
-  if (diff < 60000) return "Just now";
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-  return date.toLocaleDateString();
-}
-
-//CART
-
-import { getCart, removeFromCart, updateQty, cartTotal, saveCart, clearCart, updateCartBadge, showToast } from "../js/cart.js";
-import { auth, db } from "../js/firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-window.addEventListener("load", () => setTimeout(() => document.getElementById("loading-screen")?.classList.add("hidden"), 1800));
-updateCartBadge();
-
-let currentUser = null;
-onAuthStateChanged(auth, u => { currentUser = u; renderCart(); });
-
-function renderCart() {
-  const cart = getCart();
-  const content = document.getElementById("cart-content");
-  if (!cart.length) {
-    content.innerHTML = `<div class="cart-empty"><h3>Your cart is empty</h3><p>Looks like you haven't added anything yet.</p><a href="../index.html#catalog" class="btn btn-primary" style="margin-top:1.5rem;display:inline-flex">Start Shopping</a></div>`;
-    return;
-  }
-  content.innerHTML = `
-  <div class="cart-grid">
-    <div class="cart-items">
-      ${cart.map(item => `
-      <div class="cart-item" data-key="${item.key}">
-        <img src="${item.images?.[0]||''}" alt="${item.name}" class="cart-item-img"/>
-        <div>
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-size">Size: ${item.selectedSize}</div>
-          <div class="cart-item-price">₦${(item.price * item.qty).toLocaleString()}</div>
-          <div class="qty-control">
-            <button class="qty-btn" onclick="changeQty('${item.key}',-1)">−</button>
-            <span class="qty-num">${item.qty}</span>
-            <button class="qty-btn" onclick="changeQty('${item.key}',1)">+</button>
-          </div>
-        </div>
-        <button class="cart-remove" onclick="removeItem('${item.key}')">✕</button>
-      </div>`).join("")}
-    </div>
-    <div class="cart-summary">
-      <div class="summary-title">Order Summary</div>
-      ${cart.map(item => `<div class="summary-row"><span>${item.name} × ${item.qty}</span><span>₦${(item.price*item.qty).toLocaleString()}</span></div>`).join("")}
-      <div class="summary-row summary-total"><span>Total</span><span>₦${cartTotal().toLocaleString()}</span></div>
-      <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:0.75rem">
-        <button class="btn btn-primary btn-full" id="checkout-btn">Proceed to Checkout</button>
-        <a href="../index.html#catalog" class="btn btn-secondary btn-full" style="text-align:center">Continue Shopping</a>
-      </div>
-    </div>
-  </div>`;
-  document.getElementById("checkout-btn")?.addEventListener("click", () => {
-    if (!currentUser) { showToast("Please sign in to checkout", "error"); return; }
-    window.location.href = "checkout.html";
+  
+  // AI Size
+  document.getElementById("ai-recommend-btn")?.addEventListener("click", () => {
+    const height = document.getElementById("ai-height").value;
+    const weight = document.getElementById("ai-weight").value;
+    if (!height || !weight) return showToast("Enter height and weight", "error");
+    const result = recommendSize({ height, weight, usualSize: document.getElementById("ai-usual-size").value, fit: document.getElementById("ai-fit").value });
+    const el = document.getElementById("ai-result");
+    el.style.display = "block";
+    el.innerHTML = `<strong style="color:var(--red)">${result.size}</strong><br>${result.message}`;
   });
-}
-window.changeQty = function(key, delta) {
-  const cart = getCart();
-  const item = cart.find(i => i.key === key);
-  if (!item) return;
-  item.qty = Math.max(1, item.qty + delta);
-  saveCart(cart);
-  renderCart();
-};
-window.removeItem = function(key) {
-  removeFromCart(key);
-  renderCart();
-  showToast("Item removed");
-};
-
-//CHECKOUT
-import { auth, db, storage } from "../js/firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { getCart, cartTotal, clearCart, updateCartBadge, showToast } from "../js/cart.js";
-
-window.addEventListener("load", () => setTimeout(() => document.getElementById("loading-screen")?.classList.add("hidden"), 1600));
-updateCartBadge();
-
-let currentUser = null;
-onAuthStateChanged(auth, u => { currentUser = u; });
-
-// Render summary
-const cart = getCart();
-const summaryEl = document.getElementById("summary-items");
-summaryEl.innerHTML = cart.map(i => `<div class="summary-item"><span>${i.name} × ${i.qty}</span><span>₦${(i.price*i.qty).toLocaleString()}</span></div>`).join("");
-const subtotal = cartTotal();
-document.getElementById("sum-subtotal").textContent = `₦${subtotal.toLocaleString()}`;
-document.getElementById("sum-total").textContent = `₦${(subtotal + 1500).toLocaleString()}`;
-
-// Payment opt selection
-let selectedMethod = "";
-let receiptFile = null;
-document.querySelectorAll(".payment-opt").forEach(opt => {
-  opt.addEventListener("click", () => {
-    document.querySelectorAll(".payment-opt").forEach(o => { o.classList.remove("selected"); o.querySelector("input").checked = false; });
-    document.querySelectorAll(".payment-detail").forEach(d => d.classList.remove("visible"));
-    opt.classList.add("selected");
-    opt.querySelector("input").checked = true;
-    selectedMethod = opt.dataset.method;
-    document.getElementById(`detail-${selectedMethod}`)?.classList.add("visible");
-    const codRow = document.getElementById("cod-fee-row");
-    if (selectedMethod === "crypto") {
-      codRow.style.display = "flex";
-      document.getElementById("sum-total").textContent = `₦${(subtotal + 2000).toLocaleString()}`;
-    } else {
-      codRow.style.display = "none";
-      document.getElementById("sum-total").textContent = `₦${(subtotal + 1500).toLocaleString()}`;
-    }
+  
+  // Theme
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    document.body.classList.toggle("light-mode");
+    localStorage.setItem("aktivity_theme", document.body.classList.contains("light-mode") ? "light" : "dark");
   });
+  if (localStorage.getItem("aktivity_theme") === "light") document.body.classList.add("light-mode");
+  
+  // Mobile nav
+  document.getElementById("hamburger")?.addEventListener("click", () => {
+    document.getElementById("hamburger").classList.toggle("open");
+    document.getElementById("mobile-nav").classList.toggle("open");
+    document.getElementById("mobile-overlay").classList.toggle("show");
+  });
+  
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting && e.target.classList.add("visible")), { threshold: 0.1 });
+  document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+  
+  // Loading screen
+  setTimeout(() => document.getElementById("loading-screen")?.classList.add("hidden"), 1800);
+  
+  // Chatbot (simple)
+  const chatToggle = document.getElementById("chatbot-toggle");
+  const chatPanel = document.getElementById("chatbot-panel");
+  chatToggle?.addEventListener("click", () => chatPanel?.classList.toggle("open"));
 });
-
-// Receipt upload
-document.getElementById("receipt-file")?.addEventListener("change", e => {
-  receiptFile = e.target.files[0];
-  if (receiptFile) document.getElementById("receipt-upload-label").textContent = `✓ ${receiptFile.name}`;
-});
-
-// Card number formatting
-document.getElementById("card-number")?.addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g,"").replace(/(.{4})/g,"$1 ").trim();
-});
-document.getElementById("card-expiry")?.addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g,"").replace(/(\d{2})(\d)/,"$1/$2").slice(0,5);
-});
-
-// Place order
-document.getElementById("place-order-btn")?.addEventListener("click", async () => {
-  if (!currentUser) { showToast("Please sign in to place an order","error"); return; }
-  if (!selectedMethod) { showToast("Select a payment method","error"); return; }
-  const fname = document.getElementById("fname").value.trim();
-  const address = document.getElementById("address").value.trim();
-  if (!fname || !address) { showToast("Fill in your delivery details","error"); return; }
-  if (selectedMethod === "bank" && !receiptFile) { showToast("Please upload your payment receipt","error"); return; }
-  if (selectedMethod === "card") {
-    const cn = document.getElementById("card-number").value.replace(/\s/g,"");
-    if (cn.length < 16) { showToast("Enter a valid card number","error"); return; }
-  }
-
-  const btn = document.getElementById("place-order-btn");
-  btn.textContent = "Processing..."; btn.disabled = true;
-
-  try {
-    let receiptUrl = null;
-    if (selectedMethod === "bank" && receiptFile) {
-      const path = `receipt-uploads/${currentUser.uid}/${Date.now()}_${receiptFile.name}`;
-      const sRef = storageRef(storage, path);
-      await uploadBytes(sRef, receiptFile);
-      receiptUrl = await getDownloadURL(sRef);
-    }
-    const refNum = "AKT-" + Math.random().toString(36).substring(2,8).toUpperCase();
-    const order = {
-      userId: currentUser.uid,
-      userEmail: currentUser.email,
-      items: cart,
-      subtotal,
-      delivery: 1500,
-      total: subtotal + 1500 + (selectedMethod === "crypto" ? 500 : 0),
-      paymentMethod: selectedMethod,
-      address: {
-        name: `${fname} ${document.getElementById("lname").value.trim()}`,
-        street: address,
-        city: document.getElementById("city").value,
-        state: document.getElementById("state").value,
-        phone: document.getElementById("phone").value,
-      },
-      status: "pending",
-      paymentStatus: selectedMethod === "bank" ? "pending_verification" : (selectedMethod === "crypto" ? "pending_cod" : "paid"),
-      receiptUrl,
-      refNum,
-      createdAt: serverTimestamp(),
-    };
-    const orderDoc = await addDoc(collection(db, "orders"), order);
-    if (selectedMethod === "bank") {
-      await addDoc(collection(db, "payments"), {
-        orderId: orderDoc.id,
-        userId: currentUser.uid,
-        receiptUrl,
-        status: "pending",
-        createdAt: serverTimestamp(),
-      });
-    }
-    clearCart();
-    document.getElementById("order-ref").textContent = refNum;
-    document.getElementById("success-modal").classList.add("open");
-    window.launchConfetti?.();
-  } catch (err) {
-    showToast(err.message, "error");
-    btn.textContent = "Place Order →"; btn.disabled = false;
-  }
-});
-
-window.launchConfetti = function() {
-  const canvas = document.getElementById("confetti-canvas");
-  if (!canvas) return;
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const ctx = canvas.getContext("2d");
-  const particles = Array.from({length:100},()=>({
-    x:Math.random()*canvas.width, y:-10,
-    r:Math.random()*6+3, vx:(Math.random()-.5)*4, vy:Math.random()*3+2,
-    color:["#FF2A2A","#E0E0E0","#FFFFFF"][Math.floor(Math.random()*3)],
-    alpha:1, rot:Math.random()*360, rotSpeed:(Math.random()-.5)*5
-  }));
-  let f=0;
-  function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-      ctx.save(); ctx.globalAlpha=p.alpha; ctx.fillStyle=p.color;
-      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r); ctx.restore();
-      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotSpeed;
-      if(p.y>canvas.height*.7) p.alpha-=.02;
-    });
-    if(++f<180) requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-  draw();
-};
 </script>
 </body>
 </html>
