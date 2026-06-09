@@ -268,30 +268,40 @@ table th{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(
 .ic{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
 /* mobile tweaks */
-@media(max-width:580px){
+@media(max-width:768px){
   section{padding:60px 0}
   .newsletter{padding:40px 22px}
   .drawer{width:100%}
   
-    .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   .card-body {
-    padding: 10px;
+    padding: 12px;
   }
   .card-name {
-    font-size: 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .card-cat {
-    font-size: 9px;
+    font-size: 10px;
   }
   .card-price strong {
-    font-size: 13px;
+    font-size: 15px;
   }
   .add-mini {
-    font-size: 9px;
+    font-size: 10px;
   }
+  .card-img {
+    aspect-ratio: 4/5;
+  }
+  .stock-meter {
+    margin-top: 8px;
+  }
+
 }
 
 </style>
