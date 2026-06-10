@@ -1141,7 +1141,7 @@ const firebaseConfig = {
 };
 const ADMIN_EMAILS = ["austinwebdev77.com"]; // ← your admin email(s)
 
-const app  = initializeApp(FB);
+const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 const storage = getStorage(app);
