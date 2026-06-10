@@ -1131,15 +1131,15 @@ import { getFirestore, collection, doc, getDocs, getDoc, addDoc,
 import { getStorage, ref as sRef, uploadBytes, getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const FB = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyA61SXnSJpWeULnFjw1plQq6xY88dy318A",
+  authDomain: "e-commerce-9dd43.firebaseapp.com",
+  projectId: "e-commerce-9dd43",
+  storageBucket: "e-commerce-9dd43.firebasestorage.app",
+  messagingSenderId: "244726336780",
+  appId: "1:244726336780:web:57ea2d3f08b718dec60d29"
 };
-const ADMIN_EMAILS = ["admin@aktivity.com"]; // ← your admin email(s)
+const ADMIN_EMAILS = ["austinwebdev77.com"]; // ← your admin email(s)
 
 const app  = initializeApp(FB);
 const auth = getAuth(app);
