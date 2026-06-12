@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AKTIVITY — Admin Console</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AKTIVITY — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
-
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 const firebaseConfig = {
   apiKey: "AIzaSyA61SXnSJpWeULnFjw1plQq6xY88dy318A",
   authDomain: "e-commerce-9dd43.firebaseapp.com",
@@ -20,436 +19,880 @@ const firebaseConfig = {
   messagingSenderId: "244726336780",
   appId: "1:244726336780:web:6fb74d7eec213cf6c60d29"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
-
-window._admin = { auth, db, storage, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, increment, ref, uploadBytes, getDownloadURL, deleteObject, signInWithEmailAndPassword, signOut };
-
-// ========== AUTH GUARD ==========
+window._fb = { auth, db, storage, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, limit, signInWithEmailAndPassword, signOut, onAuthStateChanged, ref, uploadBytes, getDownloadURL };
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    showLoginScreen();
-    return;
-  }
+  if (!user) { window.dispatchEvent(new CustomEvent('admin:auth', { detail: null })); return; }
   const snap = await getDoc(doc(db, "users", user.uid));
-  const userData = snap.exists() ? snap.data() : {};
-  if (userData.role !== 'admin') {
-    document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#080808;color:#fff;flex-direction:column;gap:16px;font-family:Inter,sans-serif"><div style="font-size:64px">⛔</div><div style="font-size:24px;font-weight:700">Access Denied</div><div>Admin privileges required</div><button onclick="window.location.href='index.html'" style="background:#c8ff00;border:none;padding:10px 24px;border-radius:5px;color:#000;font-weight:600;margin-top:16px;cursor:pointer">Back to Store</button></div>`;
+  const data = snap.exists() ? snap.data() : {};
+  if (data.role !== 'admin') {
+    await signOut(auth);
+    window.dispatchEvent(new CustomEvent('admin:auth', { detail: { denied: true } }));
     return;
   }
-  window.ADMIN_USER = { uid: user.uid, ...userData };
-  document.getElementById('login-overlay')?.remove();
-  initAdmin();
+  window.dispatchEvent(new CustomEvent('admin:auth', { detail: { user, profile: data } }));
 });
-
-function showLoginScreen() {
-  document.body.innerHTML = `
-    <div id="login-overlay" style="position:fixed;inset:0;background:#080808;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif">
-      <div style="background:#111;border:1px solid #252525;border-radius:5px;padding:40px;width:360px;max-width:90%">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;text-align:center;margin-bottom:8px;color:#fff">AKT<span style="color:#c8ff00">I</span>VITY</div>
-        <div style="text-align:center;font-size:11px;color:#666;margin-bottom:28px;letter-spacing:2px">ADMIN CONSOLE</div>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <input type="email" id="admin-email" placeholder="admin@aktivity.ng" style="background:#1a1a1a;border:1px solid #252525;border-radius:5px;padding:12px;color:#fff;font-size:13px">
-          <input type="password" id="admin-password" placeholder="password" style="background:#1a1a1a;border:1px solid #252525;border-radius:5px;padding:12px;color:#fff;font-size:13px">
-          <button id="admin-login-btn" style="background:#c8ff00;color:#000;border:none;border-radius:5px;padding:12px;font-weight:700;cursor:pointer;margin-top:8px">Sign In →</button>
-        </div>
-      </div>
-    </div>`;
-  document.getElementById('admin-login-btn').onclick = async () => {
-    const email = document.getElementById('admin-email').value.trim();
-    const pass = document.getElementById('admin-password').value;
-    if (!email || !pass) { alert('Enter credentials'); return; }
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch(e) { alert('Login failed: ' + e.message); }
-  };
-}
 </script>
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#080808;color:#efefef;font-family:'Inter',sans-serif;font-size:13px;overflow-x:hidden}
-:root{--void:#080808;--carbon:#111;--graph:#1a1a1a;--border:#252525;--bone:#efefef;--muted:#666;--lime:#c8ff00;--limed:rgba(200,255,0,.07);--red:#ff3b3b;--orange:#ffa300;--blue:#0096ff}
-.lime{color:#c8ff00}
-.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.05em}
-.bg-lime{background:#c8ff00;color:#000}
-.bg-red{background:#ff3b3b;color:#fff}
-.bg-graph{background:#1a1a1a;border:1px solid #252525}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;transition:.2s;border:none}
-.btn-lime{background:#c8ff00;color:#000}
-.btn-lime:hover{background:#d4ff26;transform:translateY(-1px)}
-.btn-outline{background:transparent;border:1px solid #252525;color:#efefef}
-.btn-outline:hover{border-color:#c8ff00;color:#c8ff00}
-.btn-red{background:#ff3b3b;color:#fff}
-.btn-red:hover{background:#ff5252}
-.btn-dark{background:#1a1a1a;border:1px solid #252525;color:#efefef}
-input,select,textarea{background:#1a1a1a;border:1px solid #252525;border-radius:5px;padding:10px 12px;color:#efefef;font-size:12px;outline:none;font-family:inherit}
-input:focus,select:focus,textarea:focus{border-color:#c8ff00}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.flex{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.w-100{width:100%}
-.mt-3{margin-top:16px}
-.mb-3{margin-bottom:16px}
-.p-3{padding:20px}
-/* ADMIN LAYOUT */
-.admin-wrap{display:flex;min-height:100vh}
-.sidebar{width:260px;background:#0c0c0c;border-right:1px solid #252525;padding:24px 16px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto}
-.main{flex:1;margin-left:260px;padding:24px 32px}
-.side-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;margin-bottom:32px;color:#fff;text-align:center}
-.side-logo span{color:#c8ff00}
-.side-item{padding:10px 14px;border-radius:5px;margin-bottom:4px;cursor:pointer;color:#666;transition:.2s;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500}
-.side-item:hover{background:#1a1a1a;color:#fff}
-.side-item.active{background:rgba(200,255,0,.08);color:#c8ff00;border-left:2px solid #c8ff00}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid #252525}
-.page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.02em}
-.card{background:#0c0c0c;border:1px solid #252525;border-radius:8px;margin-bottom:20px;overflow:hidden}
-.card-header{padding:14px 20px;border-bottom:1px solid #252525;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:#080808}
-.card-title{font-weight:700;font-size:14px}
-.table-responsive{overflow-x:auto}
-.admin-table{width:100%;border-collapse:collapse;min-width:700px}
-.admin-table th{text-align:left;padding:14px 16px;background:#080808;border-bottom:1px solid #252525;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#666}
-.admin-table td{padding:12px 16px;border-bottom:1px solid rgba(37,37,37,.5);font-size:12px}
-.admin-table tr:hover td{background:rgba(26,26,26,.4)}
-.status{font-size:9px;font-weight:700;padding:4px 10px;border-radius:20px;display:inline-block}
-.status-processing{background:rgba(255,163,0,.15);color:#ffa300}
-.status-shipped{background:rgba(0,150,255,.15);color:#0096ff}
-.status-delivered{background:rgba(200,255,0,.12);color:#c8ff00}
-.status-cancelled{background:rgba(255,59,59,.12);color:#ff3b3b}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:center;justify-content:center}
-.modal-content{background:#0c0c0c;border:1px solid #252525;border-radius:12px;width:90%;max-width:650px;max-height:85vh;overflow-y:auto}
-.modal-header{padding:16px 20px;border-bottom:1px solid #252525;display:flex;justify-content:space-between}
-.modal-body{padding:20px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
-.kpi-card{background:#0c0c0c;border:1px solid #252525;border-radius:8px;padding:18px}
-.kpi-value{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#c8ff00}
-.kpi-label{font-size:11px;color:#666;margin-top:6px}
-.toast-fixed{position:fixed;bottom:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:6px}
-.toast{background:#1a1a1a;border-left:3px solid #c8ff00;padding:10px 16px;border-radius:5px;font-size:11px;animation:slideIn .2s ease}
-@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-@media(max-width:768px){.sidebar{width:100%;position:relative;height:auto}.main{margin-left:0}.admin-wrap{flex-direction:column}}
+:root{
+  --bg:#0a0a0a; --panel:#131313; --panel2:#1a1a1a; --line:#222;
+  --text:#f5f5f5; --muted:#888; --accent:#d4ff00; --accent2:#ff3366;
+  --ok:#22c55e; --warn:#f59e0b; --err:#ef4444; --info:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.display{font-family:'Bebas Neue',sans-serif;letter-spacing:.02em;font-weight:400}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:6px;width:100%;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:600}
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:32px}
+.login-card h1{font-size:40px;color:var(--accent);margin-bottom:4px}
+.login-card .sub{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:6px;font-weight:600;font-size:13px;transition:all .15s;border:1px solid transparent}
+.btn-pri{background:var(--accent);color:#000}
+.btn-pri:hover{filter:brightness(1.1)}
+.btn-ghost{border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-sm{padding:6px 10px;font-size:11px}
+.btn-block{width:100%}
+.field{margin-bottom:14px}
+/* APP LAYOUT */
+#app{display:none;min-height:100vh}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:22px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{padding:0 22px 22px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.brand h1{font-size:28px;color:var(--accent);line-height:1}
+.brand .tag{font-size:9px;letter-spacing:.2em;color:var(--muted);margin-top:4px}
+.nav{padding:0 12px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:6px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.nav-item:hover{background:var(--panel2);color:var(--text)}
+.nav-item.active{background:var(--accent);color:#000;font-weight:600}
+.nav-item .ic{font-size:16px;width:18px;text-align:center}
+.nav-foot{padding:18px 22px;margin-top:24px;border-top:1px solid var(--line)}
+.who{font-size:11px;color:var(--muted);margin-bottom:10px}
+.who b{color:var(--text);display:block;font-size:13px}
+main{padding:28px 32px;overflow-x:hidden}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-head h2{font-size:34px}
+.page-head .sub{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.page{display:none}
+.page.active{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}}
+@media(max-width:720px){.layout{grid-template-columns:1fr}aside{position:relative;height:auto}.g4,.g2{grid-template-columns:1fr}main{padding:18px}}
+.stat{position:relative;overflow:hidden}
+.stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.stat .val{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1;margin-top:8px;color:var(--text)}
+.stat .delta{font-size:11px;margin-top:6px;color:var(--ok);font-weight:600}
+.stat .ic{position:absolute;top:16px;right:16px;font-size:22px;opacity:.4}
+/* TABLE */
+.tbl-wrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tbl-head{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:12px;flex-wrap:wrap}
+.tbl-head h3{font-size:18px;text-transform:uppercase;letter-spacing:.06em}
+.tbl-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tbl-tools input,.tbl-tools select{width:auto;min-width:140px;padding:7px 10px;font-size:12px}
+.tbl-scroll{overflow-x:auto;max-width:100%}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th{text-align:left;padding:12px 16px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);background:var(--panel2);font-weight:600;border-bottom:1px solid var(--line)}
+td{padding:14px 16px;font-size:13px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--panel2)}
+.t-img{width:40px;height:40px;border-radius:6px;background:var(--panel2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:18px}
+.t-img img{width:100%;height:100%;object-fit:cover}
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.bd-proc{background:rgba(245,158,11,.15);color:var(--warn)}
+.bd-ship{background:rgba(59,130,246,.15);color:var(--info)}
+.bd-del{background:rgba(34,197,94,.15);color:var(--ok)}
+.bd-can{background:rgba(239,68,68,.15);color:var(--err)}
+.bd-admin{background:rgba(212,255,0,.15);color:var(--accent)}
+.bd-sus{background:rgba(239,68,68,.15);color:var(--err)}
+.bd-low{background:rgba(239,68,68,.15);color:var(--err)}
+.bd-ok{background:rgba(34,197,94,.15);color:var(--ok)}
+.empty{padding:40px;text-align:center;color:var(--muted);font-size:13px}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.modal-hd h3{font-size:22px;text-transform:uppercase}
+.modal-bd{padding:22px}
+.modal-ft{padding:16px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+.x{font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.x:hover{color:var(--text)}
+/* TOAST */
+#toast{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);padding:12px 16px;border-radius:6px;font-size:13px;min-width:260px;animation:slide .25s}
+.toast.ok{border-left-color:var(--ok)}
+.toast.err{border-left-color:var(--err)}
+.toast.warn{border-left-color:var(--warn)}
+@keyframes slide{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+.mb{margin-bottom:14px}
+.mt{margin-top:14px}
+.muted{color:var(--muted)}
+.right{text-align:right}
+.center{text-align:center}
+.chart-wrap{height:280px;position:relative}
+.section-title{font-size:20px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;font-family:'Bebas Neue',sans-serif}
+hr{border:none;border-top:1px solid var(--line);margin:20px 0}
+.img-pv{width:100%;height:140px;border-radius:8px;background:var(--panel2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;margin-bottom:10px;border:1px dashed var(--line)}
+.img-pv img{width:100%;height:100%;object-fit:cover}
+.file-btn{display:block;text-align:center;padding:10px;border:1px dashed var(--line);border-radius:6px;font-size:12px;color:var(--muted);cursor:pointer}
+.file-btn:hover{border-color:var(--accent);color:var(--accent)}
+.file-btn input{display:none}
+.denied{color:var(--err);text-align:center;padding:20px;font-size:13px}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:720px){
+  aside{padding:14px 0}
+  .brand{padding:0 16px 14px}
+  .nav{flex-direction:row;overflow-x:auto;padding:0 12px}
+  .nav-item{white-space:nowrap}
+  .nav-foot{display:none}
+  table{min-width:500px}
+}
 </style>
 </head>
 <body>
-
-<div class="admin-wrap" style="display:none" id="admin-app">
-  <div class="sidebar">
-    <div class="side-logo">AKT<span>I</span>VITY<br><span style="font-size:10px;letter-spacing:2px">ADMIN</span></div>
-    <div class="side-item" data-tab="dashboard">📊 Dashboard</div>
-    <div class="side-item" data-tab="products">👕 Products</div>
-    <div class="side-item" data-tab="orders">📦 Orders</div>
-    <div class="side-item" data-tab="customers">👥 Customers</div>
-    <div class="side-item" data-tab="notifications">🔔 Broadcast</div>
-    <div class="side-item" data-tab="settings">⚙️ Settings</div>
-    <div style="margin-top:40px;padding-top:20px;border-top:1px solid #252525">
-      <div class="side-item" id="logout-btn">🚪 Sign Out</div>
+<!-- LOGIN -->
+<section id="login">
+  <div class="login-card">
+    <h1>AKTIVITY</h1>
+    <div class="sub">Admin Console</div>
+    <div class="field">
+      <label>Email</label>
+      <input id="li-email" type="email" placeholder="admin@aktivity.com"/>
     </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="li-pass" type="password" placeholder="••••••••"/>
+    </div>
+    <button class="btn btn-pri btn-block" id="li-btn">Sign In</button>
+    <div id="li-msg" class="denied" style="display:none"></div>
   </div>
-  <div class="main">
-    <div class="top-bar">
-      <div class="page-title" id="main-title">Dashboard</div>
-      <div class="flex"><span style="font-size:11px;color:#666" id="admin-email-display"></span></div>
+</section>
+<!-- APP -->
+<section id="app">
+<div class="layout">
+  <aside>
+    <div class="brand">
+      <h1>AKTIVITY</h1>
+      <div class="tag">ADMIN · v1.0</div>
     </div>
-    <div id="tab-content"></div>
-  </div>
-</div>
-
-<div id="toast-container" class="toast-fixed"></div>
-
-<script>
-const toast = (msg, type='info') => {
-  const div = document.createElement('div');
-  div.className = 'toast';
-  div.innerHTML = msg;
-  div.style.borderLeftColor = type==='err'?'#ff3b3b':type==='warn'?'#ffa300':'#c8ff00';
-  document.getElementById('toast-container').appendChild(div);
-  setTimeout(()=>div.remove(), 3500);
-};
-
-let currentTab = 'dashboard';
-let products = [], orders = [], customers = [], stats = {};
-
-const db = window._admin.db;
-const storage = window._admin.storage;
-const auth = window._admin.auth;
-
-async function initAdmin() {
-  document.getElementById('admin-app').style.display = 'flex';
-  document.getElementById('admin-email-display').innerHTML = window.ADMIN_USER?.email || 'admin';
-  document.querySelectorAll('.side-item[data-tab]').forEach(el => {
-    el.onclick = () => switchTab(el.getAttribute('data-tab'));
-  });
-  document.getElementById('logout-btn').onclick = async () => {
-    await window._admin.signOut(auth);
-    location.reload();
-  };
-  await loadRealTimeData();
-  switchTab('dashboard');
-}
-
-async function loadRealTimeData() {
-  // Products
-  window._admin.onSnapshot(window._admin.collection(db, 'products'), (snap) => {
-    products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (currentTab === 'products') renderProducts();
-    updateStats();
-  });
-  // Orders
-  window._admin.onSnapshot(window._admin.query(window._admin.collection(db, 'orders'), window._admin.orderBy('createdAt', 'desc')), (snap) => {
-    orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (currentTab === 'orders') renderOrders();
-    if (currentTab === 'dashboard') renderDashboard();
-    updateStats();
-  });
-  // Customers (users with role customer)
-  window._admin.onSnapshot(window._admin.query(window._admin.collection(db, 'users'), window._admin.where('role', '==', 'customer')), (snap) => {
-    customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (currentTab === 'customers') renderCustomers();
-    updateStats();
-  });
-}
-
-function updateStats() {
-  const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const pendingOrders = orders.filter(o => o.status === 'processing').length;
-  const lowStock = products.filter(p => (p.stock || 0) < 10 && (p.stock || 0) > 0).length;
-  stats = { totalOrders: orders.length, totalSales, pendingOrders, lowStock, productsCount: products.length };
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
-  document.querySelector(`.side-item[data-tab="${tab}"]`).classList.add('active');
-  const titleMap = { dashboard:'Dashboard', products:'Product Management', orders:'Order Management', customers:'Customer Directory', notifications:'Broadcast Message', settings:'Store Settings' };
-  document.getElementById('main-title').innerHTML = titleMap[tab] || tab;
-  if (tab === 'dashboard') renderDashboard();
-  else if (tab === 'products') renderProducts();
-  else if (tab === 'orders') renderOrders();
-  else if (tab === 'customers') renderCustomers();
-  else if (tab === 'notifications') renderNotifications();
-  else if (tab === 'settings') renderSettings();
-}
-
-function renderDashboard() {
-  const html = `
-    <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-value">${stats.totalOrders || 0}</div><div class="kpi-label">Total Orders</div></div>
-      <div class="kpi-card"><div class="kpi-value">₦${(stats.totalSales || 0).toLocaleString()}</div><div class="kpi-label">Revenue</div></div>
-      <div class="kpi-card"><div class="kpi-value">${stats.pendingOrders || 0}</div><div class="kpi-label">Pending Orders</div></div>
-      <div class="kpi-card"><div class="kpi-value">${stats.lowStock || 0}</div><div class="kpi-label">Low Stock Items</div></div>
+    <nav class="nav" id="nav">
+      <div class="nav-item active" data-page="dash"><span class="ic">▦</span>Dashboard</div>
+      <div class="nav-item" data-page="products"><span class="ic">⊞</span>Products</div>
+      <div class="nav-item" data-page="orders"><span class="ic">⊟</span>Orders</div>
+      <div class="nav-item" data-page="users"><span class="ic">◉</span>Users</div>
+      <div class="nav-item" data-page="notif"><span class="ic">◈</span>Notifications</div>
+      <div class="nav-item" data-page="analytics"><span class="ic">◬</span>Analytics</div>
+      <div class="nav-item" data-page="settings"><span class="ic">⚙</span>Settings</div>
+    </nav>
+    <div class="nav-foot">
+      <div class="who"><b id="who-name">Admin</b><span id="who-email"></span></div>
+      <button class="btn btn-ghost btn-sm btn-block" id="logout">Sign Out</button>
     </div>
-    <div class="card"><div class="card-header"><span class="card-title">Recent Orders</span><button class="btn btn-outline" onclick="switchTab('orders')">Manage →</button></div>
-    <div class="table-responsive"><table class="admin-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>
-      ${orders.slice(0,5).map(o => `<tr><td style="color:#c8ff00;font-family:monospace">${o.orderId || o.id.slice(-6)}</td><td>${o.customer || '—'}</td><td>₦${(o.total || 0).toLocaleString()}</td><td><span class="status status-${o.status}">${o.status}</span></td><td style="color:#666">${new Date(o.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}</td></tr>`).join('')}
-      ${orders.length === 0 ? '<tr><td colspan="5" style="text-align:center;padding:40px">No orders yet</td></tr>' : ''}
-    </tbody></table></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Low Stock Alert</span></div><div class="table-responsive"><table class="admin-table"><thead><tr><th>Product</th><th>Stock</th><th>Action</th></tr></thead><tbody>
-      ${products.filter(p => p.stock < 10 && p.stock > 0).map(p => `<tr><td>${p.name}</td><td style="color:#ffa300">${p.stock} left</td><td><button class="btn btn-outline" style="padding:4px 12px;font-size:10px" onclick="openProductModal('${p.id}')">Edit Stock</button></td></tr>`).join('')}
-      ${products.filter(p => p.stock < 10 && p.stock > 0).length === 0 ? '<tr><td colspan="3" style="text-align:center;padding:32px">All stock levels are healthy ✓</td></tr>' : ''}
-    </tbody></table></div></div>
-  `;
-  document.getElementById('tab-content').innerHTML = html;
-}
-
-// PRODUCTS
-function renderProducts() {
-  const html = `
-    <div style="margin-bottom:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
-      <button class="btn btn-lime" onclick="openProductModal()">+ Add New Product</button>
-      <div class="flex"><input type="text" id="prod-search" placeholder="Search products..." style="width:220px" onkeyup="filterProducts()"/></div>
+  </aside>
+  <main>
+    <!-- DASHBOARD -->
+    <div class="page active" id="p-dash">
+      <div class="page-head"><div><h2>Dashboard</h2><div class="sub">Store overview</div></div></div>
+      <div class="grid g4 mb">
+        <div class="card stat"><div class="ic">₦</div><div class="lbl">Revenue</div><div class="val" id="d-rev">₦0</div><div class="delta" id="d-rev-d">—</div></div>
+        <div class="card stat"><div class="ic">⊟</div><div class="lbl">Orders</div><div class="val" id="d-ord">0</div><div class="delta muted" id="d-ord-d">All time</div></div>
+        <div class="card stat"><div class="ic">◉</div><div class="lbl">Customers</div><div class="val" id="d-cus">0</div><div class="delta muted">Registered</div></div>
+        <div class="card stat"><div class="ic">⚠</div><div class="lbl">Low Stock</div><div class="val" id="d-low">0</div><div class="delta" id="d-low-d">Items ≤ 5</div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="section-title">Revenue · Last 7 Days</div>
+          <div class="chart-wrap"><canvas id="ch-rev"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Recent Orders</div>
+          <div id="d-recent" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <div class="section-title">Low Stock Alerts</div>
+        <div id="d-lowlist" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
     </div>
-    <div class="card"><div class="table-responsive"><table class="admin-table" id="products-table"><thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Category</th><th>Status</th><th style="width:100px">Actions</th></tr></thead><tbody id="products-tbody"></tbody></table></div></div>
-  `;
-  document.getElementById('tab-content').innerHTML = html;
-  filterProducts();
-}
-
-function filterProducts() {
-  const search = (document.getElementById('prod-search')?.value || '').toLowerCase();
-  const filtered = products.filter(p => p.name?.toLowerCase().includes(search) || (p.category || '').includes(search));
-  const tbody = document.getElementById('products-tbody');
-  if (tbody) tbody.innerHTML = filtered.map(p => `
-    <tr>
-      <td><div style="width:36px;height:36px;background:#1a1a1a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px">${p.emoji || '👕'}</div></td>
-      <td style="font-weight:500">${p.name || 'Untitled'}</td>
-      <td>₦${(p.price || 0).toLocaleString()}</td>
-      <td style="color:${(p.stock || 0) < 5 ? '#ff3b3b' : '#c8ff00'}">${p.stock ?? '—'}</td>
-      <td><span class="badge bg-graph">${p.category || 'general'}</span></td>
-      <td>${p.disabled ? '<span class="badge bg-red">Disabled</span>' : '<span class="badge bg-lime">Active</span>'}</td>
-      <td><div class="flex" style="gap:6px"><button class="btn btn-outline" style="padding:5px 9px;font-size:10px" onclick="openProductModal('${p.id}')">Edit</button><button class="btn btn-red" style="padding:5px 9px;font-size:10px" onclick="deleteProduct('${p.id}')">Del</button></div></td>
-    </tr>
-  `).join('') || '<tr><td colspan="7" style="text-align:center;padding:48px">No products found</td></tr>';
-}
-
-async function openProductModal(productId = null) {
-  const product = productId ? products.find(p => p.id === productId) : null;
-  const modalHtml = `
-    <div id="product-modal" class="modal-overlay" style="display:flex">
-      <div class="modal-content" style="max-width:600px">
-        <div class="modal-header"><span style="font-weight:700">${product ? 'Edit Product' : 'Create Product'}</span><button class="btn btn-ghost" onclick="closeModal()">✕</button></div>
-        <div class="modal-body">
-          <div class="grid-2">
-            <input type="text" id="prod-name" placeholder="Product name" value="${product?.name || ''}">
-            <input type="text" id="prod-category" placeholder="Category (clothes/shoes/accessories)" value="${product?.category || ''}">
-            <input type="number" id="prod-price" placeholder="Price (₦)" value="${product?.price || ''}">
-            <input type="number" id="prod-stock" placeholder="Stock quantity" value="${product?.stock || 0}">
+    <!-- PRODUCTS -->
+    <div class="page" id="p-products">
+      <div class="page-head">
+        <div><h2>Products</h2><div class="sub"><span id="pr-count">0</span> total</div></div>
+        <button class="btn btn-pri" id="pr-new">+ New Product</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <h3>Catalog</h3>
+          <div class="tbl-tools">
+            <input id="pr-search" placeholder="Search..."/>
+            <select id="pr-filter"><option value="">All</option><option value="low">Low Stock</option><option value="out">Out of Stock</option><option value="disabled">Disabled</option></select>
           </div>
-          <textarea id="prod-desc" placeholder="Description" rows="2" class="w-100 mt-3">${product?.description || ''}</textarea>
-          <input type="text" id="prod-sizes" placeholder="Sizes (comma: S,M,L,XL)" class="w-100 mt-3" value="${product?.sizes?.join(',') || ''}">
-          <input type="text" id="prod-colors" placeholder="Colors (comma: Black,White,Lime)" class="w-100 mt-3" value="${product?.colors?.join(',') || ''}">
-          <input type="text" id="prod-tags" placeholder="Tags (comma: new,sale,limited)" class="w-100 mt-3" value="${product?.tags?.join(',') || ''}">
-          <div class="flex mt-3"><label><input type="checkbox" id="prod-disabled" ${product?.disabled ? 'checked' : ''}> Disabled (hidden from store)</label></div>
-          <div class="flex mt-3"><div class="btn btn-outline" onclick="triggerImageUpload()">Upload Image</div><span id="img-status" style="font-size:10px;color:#666">${product?.imageUrl ? 'Image uploaded' : 'No image'}</span></div>
-          <input type="file" id="image-file" accept="image/*" style="display:none" onchange="uploadProductImage()">
-          <button class="btn btn-lime w-100 mt-3" onclick="saveProduct('${product?.id || ''}')">Save Product</button>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+            <tbody id="pr-body"></tbody>
+          </table>
         </div>
       </div>
     </div>
-  `;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  window.productTempId = product?.id || null;
-}
-
-function triggerImageUpload() { document.getElementById('image-file').click(); }
-let pendingImageFile = null;
-async function uploadProductImage() {
-  const file = document.getElementById('image-file').files[0];
-  if (!file) return;
-  pendingImageFile = file;
-  document.getElementById('img-status').innerHTML = 'Uploading...';
-  const storageRef = window._admin.ref(storage, `products/${Date.now()}_${file.name}`);
-  await window._admin.uploadBytes(storageRef, file);
-  const url = await window._admin.getDownloadURL(storageRef);
-  window.productImageUrl = url;
-  document.getElementById('img-status').innerHTML = '✓ Image ready';
-  toast('Image uploaded');
-}
-async function saveProduct(id) {
-  const name = document.getElementById('prod-name')?.value.trim();
-  if (!name) { toast('Product name required', 'err'); return; }
-  const data = {
-    name, category: document.getElementById('prod-category')?.value || 'general',
-    price: Number(document.getElementById('prod-price')?.value) || 0,
-    stock: Number(document.getElementById('prod-stock')?.value) || 0,
-    description: document.getElementById('prod-desc')?.value || '',
-    sizes: document.getElementById('prod-sizes')?.value.split(',').map(s=>s.trim()).filter(Boolean) || [],
-    colors: document.getElementById('prod-colors')?.value.split(',').map(c=>c.trim()).filter(Boolean) || [],
-    tags: document.getElementById('prod-tags')?.value.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean) || [],
-    disabled: document.getElementById('prod-disabled')?.checked || false,
-    updatedAt: window._admin.serverTimestamp(),
-  };
-  if (window.productImageUrl) data.imageUrl = window.productImageUrl;
-  if (id) {
-    await window._admin.updateDoc(window._admin.doc(db, 'products', id), data);
-    toast('Product updated');
-  } else {
-    data.createdAt = window._admin.serverTimestamp();
-    data.emoji = '👕';
-    await window._admin.addDoc(window._admin.collection(db, 'products'), data);
-    toast('Product created');
-  }
-  closeModal();
-}
-async function deleteProduct(id) {
-  if (!confirm('Delete this product permanently?')) return;
-  await window._admin.deleteDoc(window._admin.doc(db, 'products', id));
-  toast('Deleted');
-}
-
-// ORDERS
-function renderOrders() {
-  const html = `<div class="card"><div class="card-header"><span class="card-title">All Orders</span><select id="order-filter" onchange="renderOrders()" style="width:140px"><option value="">All Status</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></div>
-  <div class="table-responsive"><table class="admin-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="orders-tbody"></tbody></table></div></div>`;
-  document.getElementById('tab-content').innerHTML = html;
-  const filter = document.getElementById('order-filter')?.value || '';
-  const filtered = filter ? orders.filter(o => o.status === filter) : orders;
-  const tbody = document.getElementById('orders-tbody');
-  tbody.innerHTML = filtered.map(o => `
-    <tr><td style="color:#c8ff00;font-family:monospace">${o.orderId || o.id.slice(-6)}</td><td>${o.customer || o.email || '—'}</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(o.items || []).map(i=>i.name).join(', ') || '-'}</td><td>₦${(o.total || 0).toLocaleString()}</td><td>${o.payment || '—'}</td><td><select class="status-select" data-id="${o.id}" onchange="updateOrderStatus('${o.id}', this.value)"><option ${o.status==='processing'?'selected':''}>processing</option><option ${o.status==='shipped'?'selected':''}>shipped</option><option ${o.status==='delivered'?'selected':''}>delivered</option><option ${o.status==='cancelled'?'selected':''}>cancelled</option></select></td>
-    <td><button class="btn btn-outline" style="padding:4px 10px" onclick="viewOrderDetail('${o.id}')">View</button></td></tr>
-  `).join('') || '<tr><td colspan="7" style="text-align:center;padding:48px">No orders</td></tr>';
-}
-async function updateOrderStatus(orderId, status) {
-  await window._admin.updateDoc(window._admin.doc(db, 'orders', orderId), { status, updatedAt: window._admin.serverTimestamp() });
-  toast(`Order status → ${status}`);
-  if (status === 'shipped') {
-    await window._admin.addDoc(window._admin.collection(db, 'notifications'), { uid: (orders.find(o=>o.id===orderId)?.uid) || '', type: 'order', read: false, msg: `Your order #${orderId.slice(-6)} has been shipped!`, createdAt: window._admin.serverTimestamp() });
-  }
-}
-function viewOrderDetail(orderId) { alert('Full order view would show items & address. Check Firestore console for now.'); }
-
-// CUSTOMERS
-function renderCustomers() {
-  const html = `<div class="card"><div class="card-header"><span class="card-title">Customer Accounts</span></div><div class="table-responsive"><table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Reward Points</th><th>Actions</th></tr></thead><tbody id="customers-tbody"></tbody></table></div></div>`;
-  document.getElementById('tab-content').innerHTML = html;
-  const tbody = document.getElementById('customers-tbody');
-  tbody.innerHTML = customers.map(c => `<tr><td>${c.firstName || ''} ${c.lastName || ''}</td><td>${c.email}</td><td style="color:#666">${c.createdAt?.toDate?.().toLocaleDateString() || '—'}</td><td>${c.rewardPoints || 0}</td><td><button class="btn btn-outline" style="padding:4px 12px" onclick="toggleSuspend('${c.id}','${c.suspended}')">${c.suspended ? 'Unsuspend' : 'Suspend'}</button></td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;padding:48px">No customers found</td></tr>';
-}
-async function toggleSuspend(uid, current) {
-  const newStatus = !(current === 'true' || current === true);
-  await window._admin.updateDoc(window._admin.doc(db, 'users', uid), { suspended: newStatus });
-  toast(newStatus ? 'Account suspended' : 'Account reactivated');
-}
-
-// BROADCAST
-function renderNotifications() {
-  const html = `
-    <div class="card"><div class="card-header"><span class="card-title">Send Broadcast Message</span></div><div class="p-3">
-      <textarea id="broadcast-msg" placeholder="Message to all customers..." rows="3" style="width:100%;margin-bottom:12px"></textarea>
-      <div class="flex"><button class="btn btn-lime" onclick="sendBroadcast()">Send to All Customers</button></div>
-    </div></div>
-  `;
-  document.getElementById('tab-content').innerHTML = html;
-}
-async function sendBroadcast() {
-  const msg = document.getElementById('broadcast-msg')?.value.trim();
-  if (!msg) { toast('Enter a message', 'err'); return; }
-  for (const cust of customers) {
-    await window._admin.addDoc(window._admin.collection(db, 'notifications'), { uid: cust.id, type: 'broadcast', read: false, msg, createdAt: window._admin.serverTimestamp() });
-  }
-  toast(`Broadcast sent to ${customers.length} customers`);
-  document.getElementById('broadcast-msg').value = '';
-}
-
-// SETTINGS
-async function renderSettings() {
-  const snap = await window._admin.getDoc(window._admin.doc(db, 'settings', 'store'));
-  const s = snap.exists() ? snap.data() : {};
-  const html = `
-    <div class="card"><div class="card-header"><span class="card-title">Store Configuration</span></div><div class="p-3">
-      <div class="grid-2">
-        <div><label style="color:#666">Shipping Fee (₦)</label><input id="set-ship" type="number" value="${s.shippingFee || 2500}" class="w-100"></div>
-        <div><label style="color:#666">Free Shipping Threshold (₦)</label><input id="set-free" type="number" value="${s.freeShippingThreshold || 50000}" class="w-100"></div>
-        <div><label style="color:#666">Banner Text</label><input id="set-banner" value="${s.bannerText || 'FREE DELIVERY ON ORDERS OVER ₦50,000'}" class="w-100"></div>
-        <div><label style="color:#666">Emergency Contact</label><input id="set-emergency" value="${s.emergencyContact || '+234 800 AKTIVITY'}" class="w-100"></div>
+    <!-- ORDERS -->
+    <div class="page" id="p-orders">
+      <div class="page-head"><div><h2>Orders</h2><div class="sub"><span id="or-count">0</span> total</div></div></div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <h3>All Orders</h3>
+          <div class="tbl-tools">
+            <input id="or-search" placeholder="Order ID, tracking, email..."/>
+            <select id="or-filter"><option value="">All Status</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option></select>
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Tracking</th><th>Date</th><th></th></tr></thead>
+            <tbody id="or-body"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="mt-3"><label style="color:#666">Ticker Items (comma separated)</label><textarea id="set-ticker" rows="2" style="width:100%">${(s.tickerItems || []).join(',')}</textarea></div>
-      <button class="btn btn-lime mt-3" onclick="saveSettings()">Save Settings</button>
-    </div></div>
-  `;
-  document.getElementById('tab-content').innerHTML = html;
+    </div>
+    <!-- USERS -->
+    <div class="page" id="p-users">
+      <div class="page-head"><div><h2>Users</h2><div class="sub"><span id="us-count">0</span> registered</div></div></div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <h3>Customers</h3>
+          <div class="tbl-tools">
+            <input id="us-search" placeholder="Name or email..."/>
+            <select id="us-filter"><option value="">All</option><option value="admin">Admins</option><option value="suspended">Suspended</option></select>
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Orders</th><th>Spent</th><th>Status</th><th></th></tr></thead>
+            <tbody id="us-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="p-notif">
+      <div class="page-head"><div><h2>Notifications</h2><div class="sub">Send push to users</div></div></div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="section-title">Compose</div>
+          <div class="field">
+            <label>Recipients</label>
+            <select id="nf-target"><option value="all">All Users</option><option value="customers">Customers Only (with orders)</option><option value="one">Specific User</option></select>
+          </div>
+          <div class="field" id="nf-uid-wrap" style="display:none">
+            <label>User Email</label>
+            <input id="nf-email" placeholder="customer@example.com"/>
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <select id="nf-type"><option value="promo">Promo</option><option value="order">Order Update</option><option value="info">Info</option><option value="alert">Alert</option></select>
+          </div>
+          <div class="field">
+            <label>Message</label>
+            <textarea id="nf-msg" rows="4" placeholder="Your message..."></textarea>
+          </div>
+          <button class="btn btn-pri btn-block" id="nf-send">Send Notification</button>
+        </div>
+        <div class="card">
+          <div class="section-title">Recent Notifications</div>
+          <div id="nf-list" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ANALYTICS -->
+    <div class="page" id="p-analytics">
+      <div class="page-head"><div><h2>Analytics</h2><div class="sub">Sales insights</div></div></div>
+      <div class="grid g3 mb">
+        <div class="card stat"><div class="lbl">Avg Order Value</div><div class="val" id="a-aov">₦0</div></div>
+        <div class="card stat"><div class="lbl">Conversion (orders/users)</div><div class="val" id="a-conv">0%</div></div>
+        <div class="card stat"><div class="lbl">Total Units Sold</div><div class="val" id="a-units">0</div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="section-title">Revenue Trend (30 days)</div>
+          <div class="chart-wrap"><canvas id="ch-trend"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Orders by Status</div>
+          <div class="chart-wrap"><canvas id="ch-status"></canvas></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <div class="section-title">Top Products</div>
+        <div class="tbl-scroll"><table><thead><tr><th>#</th><th>Product</th><th>Units Sold</th><th>Revenue</th></tr></thead><tbody id="a-top"></tbody></table></div>
+      </div>
+    </div>
+    <!-- SETTINGS -->
+    <div class="page" id="p-settings">
+      <div class="page-head"><div><h2>Settings</h2><div class="sub">Store configuration</div></div></div>
+      <div class="card">
+        <div class="section-title">Store</div>
+        <div class="grid g2 mb">
+          <div><label>Shipping Fee (₦)</label><input id="st-ship" type="number"/></div>
+          <div><label>Free Shipping Threshold (₦)</label><input id="st-free" type="number"/></div>
+        </div>
+        <div class="mb"><label>Emergency Contact</label><input id="st-em"/></div>
+        <hr/>
+        <div class="section-title">Banner</div>
+        <div class="mb"><label>Banner Text</label><input id="st-bn"/></div>
+        <div class="row mb"><div><label>Banner Active</label><select id="st-ba"><option value="true">Yes</option><option value="false">No</option></select></div></div>
+        <hr/>
+        <div class="section-title">Promo Ticker</div>
+        <div class="mb"><label>Ticker Items (one per line)</label><textarea id="st-tk" rows="5"></textarea></div>
+        <button class="btn btn-pri" id="st-save">Save Settings</button>
+      </div>
+    </div>
+  </main>
+</div>
+</section>
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="pr-modal">
+  <div class="modal">
+    <div class="modal-hd"><h3 id="pm-title">New Product</h3><span class="x" data-close="pr-modal">✕</span></div>
+    <div class="modal-bd">
+      <div class="img-pv" id="pm-pv">👕</div>
+      <label class="file-btn"><input type="file" id="pm-file" accept="image/*"/>📷 Upload Image</label>
+      <div class="mb mt"><label>Or Image URL</label><input id="pm-url" placeholder="https://..."/></div>
+      <div class="row mb"><div><label>Name *</label><input id="pm-name"/></div><div><label>Emoji</label><input id="pm-emoji" placeholder="👕" maxlength="4"/></div></div>
+      <div class="row mb"><div><label>Price (₦) *</label><input id="pm-price" type="number"/></div><div><label>Stock</label><input id="pm-stock" type="number" value="0"/></div></div>
+      <div class="row mb"><div><label>Category</label><input id="pm-cat" placeholder="Tees, Hoodies..."/></div><div><label>Tags (comma)</label><input id="pm-tags" placeholder="new, sale"/></div></div>
+      <div class="row mb"><div><label>Sizes (comma)</label><input id="pm-sizes" placeholder="S, M, L, XL"/></div><div><label>Colors (comma)</label><input id="pm-colors" placeholder="Black, White"/></div></div>
+      <div class="mb"><label>Description</label><textarea id="pm-desc" rows="3"></textarea></div>
+      <div><label>Disabled</label><select id="pm-dis"><option value="false">No</option><option value="true">Yes</option></select></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" data-close="pr-modal">Cancel</button>
+      <button class="btn btn-pri" id="pm-save">Save</button>
+    </div>
+  </div>
+</div>
+<!-- ORDER MODAL -->
+<div class="modal-bg" id="or-modal">
+  <div class="modal">
+    <div class="modal-hd"><h3>Order Details</h3><span class="x" data-close="or-modal">✕</span></div>
+    <div class="modal-bd" id="om-body"></div>
+  </div>
+</div>
+<!-- USER MODAL -->
+<div class="modal-bg" id="us-modal">
+  <div class="modal">
+    <div class="modal-hd"><h3>User Details</h3><span class="x" data-close="us-modal">✕</span></div>
+    <div class="modal-bd" id="um-body"></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   AKTIVITY ADMIN — Application Logic
+═══════════════════════════════════════════════════════════════ */
+const $ = (id) => document.getElementById(id);
+const S = { user:null, products:[], orders:[], users:[], notifs:[], settings:{}, editingProductId:null, charts:{} };
+function toast(msg, type='ok'){
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('toast').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
 }
-async function saveSettings() {
-  const data = {
-    shippingFee: Number(document.getElementById('set-ship')?.value) || 0,
-    freeShippingThreshold: Number(document.getElementById('set-free')?.value) || 0,
-    bannerText: document.getElementById('set-banner')?.value || '',
-    emergencyContact: document.getElementById('set-emergency')?.value || '',
-    tickerItems: document.getElementById('set-ticker')?.value.split(',').map(s=>s.trim()) || [],
-    updatedAt: window._admin.serverTimestamp(),
+const fmtN = (n) => (Number(n)||0).toLocaleString();
+const fmtDate = (ts) => {
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+};
+const fmtDateTime = (ts) => {
+  if(!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+};
+/* ─── AUTH ─── */
+window.addEventListener('admin:auth', (e) => {
+  if (e.detail?.denied) {
+    $('li-msg').textContent = 'Access denied. Admin role required.';
+    $('li-msg').style.display = 'block';
+    return;
+  }
+  if (!e.detail) {
+    $('login').style.display = 'flex';
+    $('app').style.display = 'none';
+    // tear down listeners
+    Object.values(S.unsub || {}).forEach(fn => fn && fn());
+    S.unsub = {};
+    return;
+  }
+  S.user = e.detail.user;
+  S.profile = e.detail.profile;
+  $('who-name').textContent = e.detail.profile.firstName ? `${e.detail.profile.firstName} ${e.detail.profile.lastName||''}` : 'Admin';
+  $('who-email').textContent = e.detail.user.email;
+  $('login').style.display = 'none';
+  $('app').style.display = 'block';
+  bootData();
+});
+$('li-btn').onclick = async () => {
+  const em = $('li-email').value.trim(), pw = $('li-pass').value;
+  if (!em || !pw) return toast('Email and password required','err');
+  $('li-btn').innerHTML = '<span class="loader"></span>';
+  try {
+    await window._fb.signInWithEmailAndPassword(window._fb.auth, em, pw);
+  } catch(e) {
+    $('li-msg').textContent = e.message.replace('Firebase: ','');
+    $('li-msg').style.display = 'block';
+  }
+  $('li-btn').textContent = 'Sign In';
+};
+['li-email','li-pass'].forEach(id => $(id).addEventListener('keydown',e=>{if(e.key==='Enter')$('li-btn').click()}));
+$('logout').onclick = async () => { await window._fb.signOut(window._fb.auth); };
+/* ─── NAV ─── */
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.onclick = () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    const p = el.dataset.page;
+    $('p-'+p).classList.add('active');
+    if (p === 'analytics') renderAnalytics();
+    if (p === 'dash') renderDash();
   };
-  await window._admin.setDoc(window._admin.doc(db, 'settings', 'store'), data, { merge: true });
-  toast('Settings updated');
+});
+/* ─── MODAL ─── */
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.onclick = () => $(el.dataset.close).classList.remove('open');
+});
+document.querySelectorAll('.modal-bg').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+/* ─── DATA LISTENERS ─── */
+function bootData(){
+  const fb = window._fb;
+  S.unsub = {};
+  S.unsub.products = fb.onSnapshot(fb.collection(fb.db,'products'), snap => {
+    S.products = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderProducts(); renderDash();
+  });
+  S.unsub.orders = fb.onSnapshot(fb.query(fb.collection(fb.db,'orders'), fb.orderBy('createdAt','desc')), snap => {
+    S.orders = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderOrders(); renderDash();
+  });
+  S.unsub.users = fb.onSnapshot(fb.collection(fb.db,'users'), snap => {
+    S.users = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderUsers(); renderDash();
+  });
+  S.unsub.notifs = fb.onSnapshot(fb.query(fb.collection(fb.db,'notifications'), fb.orderBy('createdAt','desc'), fb.limit(50)), snap => {
+    S.notifs = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    renderNotifs();
+  });
+  S.unsub.settings = fb.onSnapshot(fb.doc(fb.db,'settings','store'), snap => {
+    S.settings = snap.exists() ? snap.data() : {};
+    renderSettings();
+  });
 }
-
-function closeModal() { document.querySelector('.modal-overlay')?.remove(); }
-window.openProductModal = openProductModal; window.saveProduct = saveProduct; window.deleteProduct = deleteProduct;
-window.updateOrderStatus = updateOrderStatus; window.viewOrderDetail = viewOrderDetail; window.toggleSuspend = toggleSuspend;
-window.sendBroadcast = sendBroadcast; window.saveSettings = saveSettings; window.switchTab = switchTab;
-window.filterProducts = filterProducts; window.closeModal = closeModal; window.triggerImageUpload = triggerImageUpload;
-window.uploadProductImage = uploadProductImage;
+/* ─── DASHBOARD ─── */
+function renderDash(){
+  const totalRev = S.orders.filter(o=>o.status!=='cancelled').reduce((a,o)=>a+(Number(o.total)||0),0);
+  $('d-rev').textContent = '₦' + fmtN(totalRev);
+  $('d-ord').textContent = S.orders.length;
+  $('d-cus').textContent = S.users.filter(u=>u.role!=='admin').length;
+  const low = S.products.filter(p=>p.stock!==undefined && p.stock<=5);
+  $('d-low').textContent = low.length;
+  $('d-low-d').textContent = low.length ? 'Needs restock' : 'All good';
+  $('d-low-d').style.color = low.length ? 'var(--err)' : 'var(--ok)';
+  // 7-day comparison
+  const now = Date.now(), day = 86400000;
+  const last7 = S.orders.filter(o=>o.createdAt?.toMillis && now-o.createdAt.toMillis()<7*day && o.status!=='cancelled').reduce((a,o)=>a+(o.total||0),0);
+  const prev7 = S.orders.filter(o=>o.createdAt?.toMillis && now-o.createdAt.toMillis()<14*day && now-o.createdAt.toMillis()>=7*day && o.status!=='cancelled').reduce((a,o)=>a+(o.total||0),0);
+  const delta = prev7 ? ((last7-prev7)/prev7*100).toFixed(1) : (last7?100:0);
+  $('d-rev-d').textContent = (delta>=0?'▲ +':'▼ ') + delta + '% vs prev 7d';
+  $('d-rev-d').style.color = delta>=0 ? 'var(--ok)' : 'var(--err)';
+  // Recent orders
+  $('d-recent').innerHTML = S.orders.slice(0,5).map(o => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--panel2);border-radius:6px">
+      <div><div style="font-weight:600;font-size:13px">#${o.orderId||o.id.slice(0,8)}</div><div style="font-size:11px;color:var(--muted)">${o.customer?.email||'—'} · ${fmtDate(o.createdAt)}</div></div>
+      <div style="text-align:right"><div style="font-weight:600">₦${fmtN(o.total)}</div><span class="badge bd-${(o.status||'proc').slice(0,3)}">${o.status||'processing'}</span></div>
+    </div>`).join('') || '<div class="empty">No orders yet</div>';
+  // Low stock list
+  $('d-lowlist').innerHTML = low.slice(0,8).map(p => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--panel2);border-radius:6px">
+      <div style="display:flex;align-items:center;gap:10px"><div class="t-img">${p.imageUrl?`<img src="${p.imageUrl}"/>`:p.emoji||'👕'}</div><div><div style="font-weight:600;font-size:13px">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.category||'—'}</div></div></div>
+      <span class="badge bd-low">${p.stock} left</span>
+    </div>`).join('') || '<div class="empty" style="padding:20px">All products well-stocked ✓</div>';
+  // Chart
+  drawRevChart();
+}
+function drawRevChart(){
+  const ctx = $('ch-rev');
+  if (!ctx) return;
+  const days = [], data = [];
+  const now = new Date(); now.setHours(0,0,0,0);
+  for (let i=6;i>=0;i--){
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const next = new Date(d); next.setDate(next.getDate()+1);
+    days.push(d.toLocaleDateString('en',{weekday:'short'}));
+    const sum = S.orders.filter(o=>o.createdAt?.toDate && o.createdAt.toDate()>=d && o.createdAt.toDate()<next && o.status!=='cancelled').reduce((a,o)=>a+(o.total||0),0);
+    data.push(sum);
+  }
+  if (S.charts.rev) S.charts.rev.destroy();
+  S.charts.rev = new Chart(ctx, {
+    type:'line',
+    data:{labels:days,datasets:[{label:'Revenue',data,borderColor:'#d4ff00',backgroundColor:'rgba(212,255,0,.1)',fill:true,tension:.35,borderWidth:2,pointBackgroundColor:'#d4ff00'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888'},grid:{color:'#222'}},y:{ticks:{color:'#888',callback:v=>'₦'+(v/1000)+'k'},grid:{color:'#222'}}}}
+  });
+}
+/* ─── PRODUCTS ─── */
+function renderProducts(){
+  const search = $('pr-search').value.toLowerCase();
+  const filter = $('pr-filter').value;
+  let list = S.products.filter(p => !search || p.name?.toLowerCase().includes(search) || p.category?.toLowerCase().includes(search));
+  if (filter==='low') list = list.filter(p=>p.stock>0 && p.stock<=5);
+  if (filter==='out') list = list.filter(p=>!p.stock);
+  if (filter==='disabled') list = list.filter(p=>p.disabled);
+  $('pr-count').textContent = S.products.length;
+  $('pr-body').innerHTML = list.map(p => `
+    <tr>
+      <td><div class="t-img">${p.imageUrl?`<img src="${p.imageUrl}"/>`:p.emoji||'👕'}</div></td>
+      <td><div style="font-weight:600">${p.name||'—'}</div><div style="font-size:11px;color:var(--muted)">${(p.tags||[]).join(', ')||''}</div></td>
+      <td>${p.category||'—'}</td>
+      <td>₦${fmtN(p.price)}</td>
+      <td><span class="badge ${p.stock<=5?'bd-low':'bd-ok'}">${p.stock??0}</span></td>
+      <td>${p.disabled?'<span class="badge bd-can">Disabled</span>':'<span class="badge bd-ok">Active</span>'}</td>
+      <td class="right">
+        <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="delProduct('${p.id}')" style="border-color:var(--err);color:var(--err)">Delete</button>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="7" class="empty">No products</td></tr>';
+}
+['pr-search','pr-filter'].forEach(id=>$(id).addEventListener('input',renderProducts));
+$('pr-new').onclick = () => openProductModal(null);
+function openProductModal(id){
+  S.editingProductId = id;
+  $('pm-title').textContent = id ? 'Edit Product' : 'New Product';
+  const p = id ? S.products.find(x=>x.id===id) : {};
+  $('pm-name').value = p?.name||''; $('pm-emoji').value = p?.emoji||'';
+  $('pm-price').value = p?.price||''; $('pm-stock').value = p?.stock??0;
+  $('pm-cat').value = p?.category||''; $('pm-tags').value = (p?.tags||[]).join(', ');
+  $('pm-sizes').value = (p?.sizes||[]).join(', '); $('pm-colors').value = (p?.colors||[]).join(', ');
+  $('pm-desc').value = p?.description||''; $('pm-dis').value = p?.disabled?'true':'false';
+  $('pm-url').value = p?.imageUrl||'';
+  $('pm-pv').innerHTML = p?.imageUrl?`<img src="${p.imageUrl}"/>`:(p?.emoji||'👕');
+  $('pr-modal').classList.add('open');
+}
+window.editProduct = openProductModal;
+window.delProduct = async (id) => {
+  if (!confirm('Delete this product permanently?')) return;
+  try { await window._fb.deleteDoc(window._fb.doc(window._fb.db,'products',id)); toast('Product deleted','ok'); }
+  catch(e){ toast(e.message,'err'); }
+};
+$('pm-file').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  $('pm-pv').innerHTML = '<span class="loader"></span>';
+  try {
+    const fb = window._fb;
+    const r = fb.ref(fb.storage, `products/${Date.now()}_${f.name}`);
+    await fb.uploadBytes(r, f);
+    const url = await fb.getDownloadURL(r);
+    $('pm-url').value = url;
+    $('pm-pv').innerHTML = `<img src="${url}"/>`;
+    toast('Image uploaded','ok');
+  } catch(err){ toast(err.message,'err'); $('pm-pv').textContent='👕'; }
+});
+$('pm-url').addEventListener('input', () => {
+  const u = $('pm-url').value.trim();
+  $('pm-pv').innerHTML = u ? `<img src="${u}"/>` : ($('pm-emoji').value || '👕');
+});
+$('pm-save').onclick = async () => {
+  const name = $('pm-name').value.trim();
+  const price = Number($('pm-price').value);
+  if (!name || !price) return toast('Name and price required','err');
+  const data = {
+    name, price,
+    stock: Number($('pm-stock').value)||0,
+    category: $('pm-cat').value.trim(),
+    tags: $('pm-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    sizes: $('pm-sizes').value.split(',').map(s=>s.trim()).filter(Boolean),
+    colors: $('pm-colors').value.split(',').map(s=>s.trim()).filter(Boolean),
+    description: $('pm-desc').value.trim(),
+    emoji: $('pm-emoji').value.trim(),
+    imageUrl: $('pm-url').value.trim(),
+    disabled: $('pm-dis').value==='true',
+  };
+  try {
+    const fb = window._fb;
+    if (S.editingProductId) {
+      await fb.updateDoc(fb.doc(fb.db,'products',S.editingProductId), data);
+      toast('Product updated','ok');
+    } else {
+      data.createdAt = fb.serverTimestamp();
+      await fb.addDoc(fb.collection(fb.db,'products'), data);
+      toast('Product created','ok');
+    }
+    $('pr-modal').classList.remove('open');
+  } catch(e){ toast(e.message,'err'); }
+};
+/* ─── ORDERS ─── */
+function renderOrders(){
+  const search = $('or-search').value.toLowerCase();
+  const filter = $('or-filter').value;
+  let list = S.orders.filter(o => {
+    if (filter && o.status !== filter) return false;
+    if (!search) return true;
+    return (o.orderId||'').toLowerCase().includes(search) || (o.trackingNo||'').toLowerCase().includes(search) || (o.customer?.email||'').toLowerCase().includes(search);
+  });
+  $('or-count').textContent = S.orders.length;
+  $('or-body').innerHTML = list.map(o => `
+    <tr>
+      <td><span class="mono" style="font-size:11px">#${o.orderId||o.id.slice(0,8)}</span></td>
+      <td>${o.customer?.name||'—'}<div style="font-size:11px;color:var(--muted)">${o.customer?.email||''}</div></td>
+      <td>${(o.items||[]).length}</td>
+      <td>₦${fmtN(o.total)}</td>
+      <td><span class="badge bd-${(o.status||'proc').slice(0,3)}">${o.status||'processing'}</span></td>
+      <td><span class="mono" style="font-size:11px">${o.trackingNo||'—'}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${fmtDate(o.createdAt)}</td>
+      <td class="right"><button class="btn btn-ghost btn-sm" onclick="openOrder('${o.id}')">View</button></td>
+    </tr>`).join('') || '<tr><td colspan="8" class="empty">No orders</td></tr>';
+}
+['or-search','or-filter'].forEach(id=>$(id).addEventListener('input',renderOrders));
+window.openOrder = (id) => {
+  const o = S.orders.find(x=>x.id===id); if (!o) return;
+  S.currentOrder = id;
+  $('om-body').innerHTML = `
+    <div class="mb"><label>Order ID</label><div class="mono">#${o.orderId||o.id}</div></div>
+    <div class="grid g2 mb">
+      <div><label>Customer</label><div>${o.customer?.name||'—'}<br><span class="muted" style="font-size:12px">${o.customer?.email||''}</span><br><span class="muted" style="font-size:12px">${o.customer?.phone||''}</span></div></div>
+      <div><label>Address</label><div style="font-size:12px">${o.shipping?.address||o.customer?.address||'—'}<br>${o.shipping?.city||''} ${o.shipping?.country||''}</div></div>
+    </div>
+    <div class="mb"><label>Items</label>
+      ${(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:8px;background:var(--panel2);border-radius:6px;margin-bottom:6px"><div style="display:flex;gap:10px;align-items:center"><div class="t-img">${i.imageUrl?`<img src="${i.imageUrl}"/>`:i.emoji||'👕'}</div><div><div>${i.name}</div><div class="muted" style="font-size:11px">${i.size||''} ${i.color?'· '+i.color:''} · Qty ${i.qty}</div></div></div><div>₦${fmtN(i.price*i.qty)}</div></div>`).join('')}
+    </div>
+    <div class="mb" style="text-align:right;font-size:16px"><b>Total: ₦${fmtN(o.total)}</b></div>
+    <hr/>
+    <div class="row mb">
+      <div><label>Status</label>
+        <select id="om-status">
+          ${['processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div><label>Tracking #</label><input id="om-track" value="${o.trackingNo||''}"/></div>
+    </div>
+    <button class="btn btn-pri btn-block" onclick="saveOrder()">Update Order</button>
+  `;
+  $('or-modal').classList.add('open');
+};
+window.saveOrder = async () => {
+  const fb = window._fb;
+  const id = S.currentOrder;
+  const status = $('om-status').value;
+  const trackingNo = $('om-track').value.trim();
+  const o = S.orders.find(x=>x.id===id);
+  try {
+    await fb.updateDoc(fb.doc(fb.db,'orders',id), { status, trackingNo, updatedAt: fb.serverTimestamp() });
+    if (o.uid && o.status !== status) {
+      await fb.addDoc(fb.collection(fb.db,'notifications'), {
+        uid: o.uid, type:'order', read:false,
+        msg: `Order #${o.orderId} update: ${status.toUpperCase()}${trackingNo?` · Tracking: ${trackingNo}`:''}`,
+        createdAt: fb.serverTimestamp()
+      });
+    }
+    toast('Order updated','ok');
+    $('or-modal').classList.remove('open');
+  } catch(e){ toast(e.message,'err'); }
+};
+/* ─── USERS ─── */
+function renderUsers(){
+  const search = $('us-search').value.toLowerCase();
+  const filter = $('us-filter').value;
+  let list = S.users.filter(u => {
+    if (filter==='admin' && u.role!=='admin') return false;
+    if (filter==='suspended' && !u.suspended) return false;
+    if (!search) return true;
+    return (u.firstName||u.name||'').toLowerCase().includes(search) || (u.email||'').toLowerCase().includes(search);
+  });
+  $('us-count').textContent = S.users.length;
+  $('us-body').innerHTML = list.map(u => {
+    const name = `${u.firstName||''} ${u.lastName||''}`.trim() || u.name || '—';
+    const userOrders = S.orders.filter(o=>o.uid===u.id);
+    const spent = userOrders.reduce((a,o)=>a+(o.total||0),0);
+    return `
+    <tr>
+      <td>${name}</td>
+      <td style="font-size:12px">${u.email||'—'}</td>
+      <td>${u.role==='admin'?'<span class="badge bd-admin">Admin</span>':'<span class="badge" style="background:#222;color:#aaa">Customer</span>'}</td>
+      <td>${userOrders.length}</td>
+      <td>₦${fmtN(spent)}</td>
+      <td>${u.suspended?'<span class="badge bd-sus">Suspended</span>':'<span class="badge bd-ok">Active</span>'}</td>
+      <td class="right"><button class="btn btn-ghost btn-sm" onclick="openUser('${u.id}')">Manage</button></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" class="empty">No users</td></tr>';
+}
+['us-search','us-filter'].forEach(id=>$(id).addEventListener('input',renderUsers));
+window.openUser = (id) => {
+  const u = S.users.find(x=>x.id===id); if (!u) return;
+  S.currentUser = id;
+  const name = `${u.firstName||''} ${u.lastName||''}`.trim() || u.name || '—';
+  const userOrders = S.orders.filter(o=>o.uid===id);
+  const spent = userOrders.reduce((a,o)=>a+(o.total||0),0);
+  $('um-body').innerHTML = `
+    <div class="mb"><label>Name</label><div style="font-size:16px">${name}</div></div>
+    <div class="grid g2 mb">
+      <div><label>Email</label><div style="font-size:13px">${u.email||'—'}</div></div>
+      <div><label>Phone</label><div style="font-size:13px">${u.phone||'—'}</div></div>
+    </div>
+    <div class="grid g2 mb">
+      <div><label>Total Orders</label><div style="font-size:18px;font-weight:600">${userOrders.length}</div></div>
+      <div><label>Total Spent</label><div style="font-size:18px;font-weight:600">₦${fmtN(spent)}</div></div>
+    </div>
+    <hr/>
+    <div class="row mb">
+      <div><label>Role</label><select id="um-role"><option value="customer" ${u.role!=='admin'?'selected':''}>Customer</option><option value="admin" ${u.role==='admin'?'selected':''}>Admin</option></select></div>
+      <div><label>Status</label><select id="um-sus"><option value="false" ${!u.suspended?'selected':''}>Active</option><option value="true" ${u.suspended?'selected':''}>Suspended</option></select></div>
+    </div>
+    <button class="btn btn-pri btn-block" onclick="saveUser()">Save Changes</button>
+  `;
+  $('us-modal').classList.add('open');
+};
+window.saveUser = async () => {
+  const fb = window._fb;
+  try {
+    await fb.updateDoc(fb.doc(fb.db,'users',S.currentUser), {
+      role: $('um-role').value === 'admin' ? 'admin' : 'customer',
+      suspended: $('um-sus').value === 'true'
+    });
+    toast('User updated','ok');
+    $('us-modal').classList.remove('open');
+  } catch(e){ toast(e.message,'err'); }
+};
+/* ─── NOTIFICATIONS ─── */
+$('nf-target').addEventListener('change',()=>{
+  $('nf-uid-wrap').style.display = $('nf-target').value === 'one' ? 'block' : 'none';
+});
+$('nf-send').onclick = async () => {
+  const fb = window._fb;
+  const target = $('nf-target').value;
+  const type = $('nf-type').value;
+  const msg = $('nf-msg').value.trim();
+  if (!msg) return toast('Message required','err');
+  $('nf-send').innerHTML = '<span class="loader"></span>';
+  try {
+    let targets = [];
+    if (target === 'all') targets = S.users.filter(u=>u.role!=='admin' && !u.suspended);
+    else if (target === 'customers') {
+      const customerUids = new Set(S.orders.map(o=>o.uid).filter(Boolean));
+      targets = S.users.filter(u => customerUids.has(u.id));
+    } else {
+      const em = $('nf-email').value.trim().toLowerCase();
+      const u = S.users.find(x => (x.email||'').toLowerCase() === em);
+      if (!u) { toast('User not found','err'); $('nf-send').textContent='Send Notification'; return; }
+      targets = [u];
+    }
+    const now = fb.serverTimestamp();
+    await Promise.all(targets.map(u =>
+      fb.addDoc(fb.collection(fb.db,'notifications'), { uid:u.id, type, read:false, msg, createdAt:now })
+    ));
+    toast(`Sent to ${targets.length} user(s)`,'ok');
+    $('nf-msg').value = '';
+  } catch(e){ toast(e.message,'err'); }
+  $('nf-send').textContent = 'Send Notification';
+};
+function renderNotifs(){
+  $('nf-list').innerHTML = S.notifs.slice(0,30).map(n => {
+    const u = S.users.find(x=>x.id===n.uid);
+    return `<div style="padding:10px;background:var(--panel2);border-radius:6px;border-left:3px solid var(--accent)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="badge bd-admin">${n.type||'info'}</span><span style="font-size:10px;color:var(--muted)">${fmtDateTime(n.createdAt)}</span></div>
+      <div style="font-size:13px;margin-bottom:4px">${n.msg||''}</div>
+      <div style="font-size:11px;color:var(--muted)">→ ${u?.email||n.uid?.slice(0,8)||'—'} ${n.read?'· read':'· unread'}</div>
+    </div>`;
+  }).join('') || '<div class="empty">No notifications</div>';
+}
+/* ─── ANALYTICS ─── */
+function renderAnalytics(){
+  const valid = S.orders.filter(o=>o.status!=='cancelled');
+  const rev = valid.reduce((a,o)=>a+(o.total||0),0);
+  $('a-aov').textContent = '₦' + fmtN(valid.length ? Math.round(rev/valid.length) : 0);
+  const customers = S.users.filter(u=>u.role!=='admin').length;
+  $('a-conv').textContent = customers ? ((valid.length/customers*100).toFixed(1) + '%') : '0%';
+  const units = valid.reduce((a,o)=>a + (o.items||[]).reduce((b,i)=>b+(i.qty||0),0), 0);
+  $('a-units').textContent = fmtN(units);
+  // 30-day trend
+  if (S.charts.trend) S.charts.trend.destroy();
+  const labels=[], data=[];
+  const now = new Date(); now.setHours(0,0,0,0);
+  for (let i=29;i>=0;i--){
+    const d=new Date(now); d.setDate(d.getDate()-i);
+    const next=new Date(d); next.setDate(next.getDate()+1);
+    labels.push(d.getDate()+'/'+(d.getMonth()+1));
+    data.push(valid.filter(o=>o.createdAt?.toDate && o.createdAt.toDate()>=d && o.createdAt.toDate()<next).reduce((a,o)=>a+(o.total||0),0));
+  }
+  S.charts.trend = new Chart($('ch-trend'),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:'#d4ff00',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#888',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#888'},grid:{color:'#222'}}}}
+  });
+  // Status pie
+  if (S.charts.status) S.charts.status.destroy();
+  const statuses = ['processing','shipped','delivered','cancelled'];
+  const counts = statuses.map(s=>S.orders.filter(o=>o.status===s).length);
+  S.charts.status = new Chart($('ch-status'),{
+    type:'doughnut',
+    data:{labels:statuses,datasets:[{data:counts,backgroundColor:['#f59e0b','#3b82f6','#22c55e','#ef4444'],borderColor:'#131313',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:11}}}}}
+  });
+  // Top products
+  const tally = {};
+  valid.forEach(o => (o.items||[]).forEach(i => {
+    if (!tally[i.id]) tally[i.id] = { name:i.name, qty:0, rev:0 };
+    tally[i.id].qty += i.qty||0;
+    tally[i.id].rev += (i.price||0)*(i.qty||0);
+  }));
+  const top = Object.values(tally).sort((a,b)=>b.qty-a.qty).slice(0,10);
+  $('a-top').innerHTML = top.map((p,i)=>`<tr><td><b>#${i+1}</b></td><td>${p.name}</td><td>${p.qty}</td><td>₦${fmtN(p.rev)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">No data yet</td></tr>';
+}
+/* ─── SETTINGS ─── */
+function renderSettings(){
+  const s = S.settings || {};
+  $('st-ship').value = s.shippingFee ?? 2500;
+  $('st-free').value = s.freeShippingThreshold ?? 50000;
+  $('st-em').value = s.emergencyContact || '';
+  $('st-bn').value = s.bannerText || '';
+  $('st-ba').value = s.bannerActive ? 'true' : 'false';
+  $('st-tk').value = (s.tickerItems||[]).join('\n');
+}
+$('st-save').onclick = async () => {
+  const fb = window._fb;
+  try {
+    await fb.setDoc(fb.doc(fb.db,'settings','store'), {
+      shippingFee: Number($('st-ship').value)||0,
+      freeShippingThreshold: Number($('st-free').value)||0,
+      emergencyContact: $('st-em').value.trim(),
+      bannerText: $('st-bn').value.trim(),
+      bannerActive: $('st-ba').value === 'true',
+      tickerItems: $('st-tk').value.split('\n').map(s=>s.trim()).filter(Boolean),
+      updatedAt: fb.serverTimestamp()
+    }, { merge:true });
+    toast('Settings saved','ok');
+  } catch(e){ toast(e.message,'err'); }
+};
 </script>
 </body>
 </html>
