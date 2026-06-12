@@ -38,7 +38,9 @@ const storage = getStorage(app);
 
 /* Expose to window for use outside module */
 window._fb = { auth, db, storage, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot, serverTimestamp, increment, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail, ref, uploadBytes, getDownloadURL };
-
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword; 
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.getAuth = () => auth;
 /* ════════════════════════════════════════════════════════════
    AUTH STATE LISTENER
    ════════════════════════════════════════════════════════════ */
