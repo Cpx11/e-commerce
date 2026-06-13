@@ -200,7 +200,7 @@ window._startAdminListeners = function() {
     ];
     for (const c of defaults) await addDoc(collection(db,'categories'), { ...c, createdAt: serverTimestamp() });
   }
-})();
+});
 </script>
 
 <style>
