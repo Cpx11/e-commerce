@@ -29,6 +29,109 @@ const auth    = getAuth(app);
 const db      = getFirestore(app);
 const storage = getStorage(app);
 
+console.log('Firebase initialized');
+window._fb = { auth, db, storage, ... }; // your existing line
+
+// Add this debug helper
+window.debugAuth = function() {
+  console.log('Current auth state:', auth.currentUser);
+  console.log('Auth ready?', !!auth);
+};
+
+// Make sure global functions exist
+window.doLogin = async function() {
+  console.log('doLogin called');
+  const email = document.getElementById('li-em')?.value.trim();
+  const pass = document.getElementById('li-pw')?.value;
+  console.log('Email:', email, 'Pass length:', pass?.length);
+  if(!email || !pass) {
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = 'Fill in all fields';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+  const btn = document.getElementById('li-btn');
+  if(btn) {
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+  }
+  try {
+    console.log('Calling signInWithEmailAndPassword...');
+    const userCred = await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
+    console.log('Sign in success:', userCred.user.email);
+    // The onAuthStateChanged will handle the rest
+  } catch(e) {
+    console.error('Sign in error:', e);
+    const msgs = {
+      'auth/user-not-found': 'No admin account found.',
+      'auth/wrong-password': 'Incorrect password.',
+      'auth/invalid-email': 'Invalid email.',
+      'auth/too-many-requests': 'Too many attempts. Try later.'
+    };
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = msgs[e.code] || e.message;
+      errEl.style.display = 'block';
+    }
+    if(btn) {
+      btn.disabled = false;
+      btn.textContent = 'Access Admin Panel →';
+    }
+  }
+};
+
+window.showAdminAuth = function(err = '') {
+  console.log('showAdminAuth called with err:', err);
+  const authScreen = document.getElementById('auth-screen');
+  const app = document.getElementById('app');
+  const loader = document.getElementById('loader');
+  if(authScreen) authScreen.classList.remove('gone');
+  if(app) app.classList.add('gone');
+  if(loader) loader.style.display = 'none';
+  if(err) {
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = err;
+      errEl.style.display = 'block';
+    }
+  }
+};
+
+window.toast = function(msg, type='ok') {
+  const toasts = document.getElementById('toasts');
+  if(!toasts) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (type==='err'?' err':type==='info'?' info':type==='warn'?' warn':'');
+  el.textContent = msg;
+  toasts.appendChild(el);
+  setTimeout(()=>{
+    el.style.opacity='0';
+    el.style.transform='translateX(110%)';
+    setTimeout(()=>el.remove(),350);
+  },3800);
+};
+
+// Also attach to window for inline onclick
+window.doReset = async function() {
+  const email = prompt('Enter your admin email:');
+  if(!email) return;
+  try {
+    await window._fb.sendPasswordResetEmail(window._fb.auth, email);
+    window.toast('Reset email sent!','info');
+  } catch(e) {
+    window.toast('Error: '+e.message,'err');
+  }
+};
+
+window.doSignOut = async function() {
+  if(!confirm('Sign out of admin panel?')) return;
+  await window._fb.signOut(window._fb.auth);
+  window.showAdminAuth();
+  window.toast('Signed out','info');
+};
+
 window._fb = {
   auth, db, storage,
   collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
@@ -74,7 +177,22 @@ window.doLogin = async function() {
       btn.textContent = 'Access Admin Panel →';
     }
   }
+  // Bind login button event after DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  const liBtn = document.getElementById('li-btn');
+  if(liBtn) {
+    liBtn.onclick = () => window.doLogin();
+  }
+  const liPw = document.getElementById('li-pw');
+  if(liPw) {
+    liPw.addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') window.doLogin();
+    });
+  }
+});
 };
+
+
 
 window.doReset = async function() {
   const email = prompt('Enter your admin email:');
@@ -96,16 +214,68 @@ window.doSignOut = async function() {
 
 /* ── AUTH GATE ── */
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { showAdminAuth(); return; }
-  const snap = await getDoc(doc(db, 'users', user.uid));
-  const data = snap.exists() ? snap.data() : {};
-  if (data.role !== 'admin') {
-    await signOut(auth);
-    showAdminAuth('Access denied — admin accounts only.');
-    return;
+  console.log('Auth state changed. User:', user?.email);
+  try {
+    if (!user) {
+      console.log('No user, showing auth screen');
+      window.showAdminAuth();
+      return;
+    }
+    
+    console.log('User found, checking admin status...');
+    // Check if user document exists and has admin role
+    const userDocRef = doc(db, 'users', user.uid);
+    let snap;
+    try {
+      snap = await getDoc(userDocRef);
+    } catch(e) {
+      console.error('Error reading user doc:', e);
+      // If permission error, assume not admin
+      if(e.code === 'permission-denied') {
+        await signOut(auth);
+        window.showAdminAuth('Access denied — insufficient permissions. Please contact support.');
+        return;
+      }
+      throw e;
+    }
+    
+    if (!snap.exists()) {
+      console.log('User document does not exist, creating as customer and signing out');
+      // Create a basic user document (not admin)
+      await setDoc(userDocRef, {
+        email: user.email,
+        role: 'customer',
+        createdAt: serverTimestamp()
+      });
+      await signOut(auth);
+      window.showAdminAuth('Access denied — admin accounts only.');
+      return;
+    }
+    
+    const data = snap.data();
+    if (data.role !== 'admin') {
+      console.log('User role is not admin:', data.role);
+      await signOut(auth);
+      window.showAdminAuth('Access denied — admin accounts only.');
+      return;
+    }
+    
+    console.log('Admin authenticated successfully');
+    window.ADMIN_USER = { 
+      uid: user.uid, 
+      email: user.email, 
+      displayName: user.displayName || data.firstName || 'Admin', 
+      ...data 
+    };
+    // Hide auth screen, show app
+    document.getElementById('auth-screen').classList.add('gone');
+    document.getElementById('app').classList.remove('gone');
+    document.getElementById('loader').style.display = 'none';
+    window.dispatchEvent(new CustomEvent('admin:ready'));
+  } catch(e) {
+    console.error('Fatal auth error:', e);
+    window.showAdminAuth('Authentication error: ' + e.message);
   }
-  window.ADMIN_USER = { uid: user.uid, email: user.email, displayName: user.displayName || data.firstName || 'Admin', ...data };
-  window.dispatchEvent(new CustomEvent('admin:ready'));
 });
 
 // Make showAdminAuth globally available
@@ -126,6 +296,8 @@ window.showAdminAuth = function(err = '') {
     }
   }
 };
+
+
 
 // Also make toast global if not already
 window.toast = function(msg, type = 'ok') {
