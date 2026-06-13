@@ -108,6 +108,40 @@ onAuthStateChanged(auth, async (user) => {
   window.dispatchEvent(new CustomEvent('admin:ready'));
 });
 
+// Make showAdminAuth globally available
+window.showAdminAuth = function(err = '') {
+  const authScreen = document.getElementById('auth-screen');
+  const app = document.getElementById('app');
+  const loader = document.getElementById('loader');
+  
+  if(authScreen) authScreen.classList.remove('gone');
+  if(app) app.classList.add('gone');
+  if(loader) loader.style.display = 'none';
+  
+  if(err) {
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = err;
+      errEl.style.display = 'block';
+    }
+  }
+};
+
+// Also make toast global if not already
+window.toast = function(msg, type = 'ok') {
+  const toasts = document.getElementById('toasts');
+  if(!toasts) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (type === 'err' ? ' err' : type === 'info' ? ' info' : type === 'warn' ? ' warn' : '');
+  el.textContent = msg;
+  toasts.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(110%)';
+    setTimeout(() => el.remove(), 350);
+  }, 3800);
+};
+
 /* ── LIVE LISTENERS ── */
 window._startAdminListeners = function() {
   const fb = window._fb;
