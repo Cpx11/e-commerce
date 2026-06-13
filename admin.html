@@ -38,6 +38,62 @@ window._fb = {
   ref, uploadBytes, getDownloadURL, deleteObject
 };
 
+// Make auth functions globally available
+window.doLogin = async function() {
+  const email = document.getElementById('li-em')?.value.trim();
+  const pass = document.getElementById('li-pw')?.value;
+  if(!email || !pass) {
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = 'Fill in all fields';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+  const btn = document.getElementById('li-btn');
+  if(btn) {
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+  }
+  try {
+    await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found': 'No admin account found.',
+      'auth/wrong-password': 'Incorrect password.',
+      'auth/invalid-email': 'Invalid email.',
+      'auth/too-many-requests': 'Too many attempts. Try later.'
+    };
+    const errEl = document.getElementById('auth-err');
+    if(errEl) {
+      errEl.textContent = msgs[e.code] || e.message;
+      errEl.style.display = 'block';
+    }
+    if(btn) {
+      btn.disabled = false;
+      btn.textContent = 'Access Admin Panel →';
+    }
+  }
+};
+
+window.doReset = async function() {
+  const email = prompt('Enter your admin email:');
+  if(!email) return;
+  try {
+    await window._fb.sendPasswordResetEmail(window._fb.auth, email);
+    window.toast?.('Reset email sent!', 'info');
+  } catch(e) {
+    window.toast?.('Error: ' + e.message, 'err');
+  }
+};
+
+window.doSignOut = async function() {
+  if(!confirm('Sign out of admin panel?')) return;
+  await window._fb.signOut(window._fb.auth);
+  window.showAdminAuth();
+  window.toast?.('Signed out', 'info');
+};
+
 /* ── AUTH GATE ── */
 onAuthStateChanged(auth, async (user) => {
   if (!user) { showAdminAuth(); return; }
